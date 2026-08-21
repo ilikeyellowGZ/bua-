@@ -47,7 +47,7 @@ const sprites: Record<MascotPose, ImageSource> = {
   'placement-thinking': require('@/assets/mascot/generated/full-thinking.png'),
   'phrase-builder-cheer': require('@/assets/mascot/generated/face-celebrate.png'),
   'picture-match-point': require('@/assets/mascot/generated/full-point-right.png'),
-  'conversation-passenger': require('@/assets/mascot/generated/face-calm.png'),
+  'conversation-passenger': require('@/assets/mascot/generated/face-headphones.png'),
   'dictation-listen': require('@/assets/mascot/generated/face-headphones.png'),
   'pronunciation-coach': require('@/assets/mascot/generated/full-microphone.png'),
   'premium-crown': require('@/assets/mascot/generated/face-crown.png'),

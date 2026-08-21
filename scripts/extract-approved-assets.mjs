@@ -15,7 +15,7 @@ const sha256 = (value) => createHash('sha256').update(value).digest('hex');
 const isBoardBackground = (red, green, blue) => {
   const maximum = Math.max(red, green, blue);
   const minimum = Math.min(red, green, blue);
-  return minimum >= 238 && maximum - minimum <= 8;
+  return minimum >= 220 && maximum - minimum <= 12;
 };
 
 function removeConnectedBoard(crop) {
@@ -63,7 +63,7 @@ await mkdir(outputDir, { recursive: true });
 const manifest = {
   schemaVersion: 1,
   method:
-    'Crop measured rectangles, then clear only border-connected near-neutral board pixels (RGB minimum >= 238; channel spread <= 8). Foreground RGB is never rewritten.',
+    'Crop measured rectangles, then clear only border-connected near-neutral board pixels (RGB minimum >= 220; channel spread <= 12). Foreground RGB is never rewritten.',
   generatedAt: 'reproducible-build-step',
   sprites: [],
 };

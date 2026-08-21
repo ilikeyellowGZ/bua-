@@ -1,0 +1,112 @@
+[
+  {
+    "id": "cafe-story",
+    "source": "04_bua_listening_story.png",
+    "crop": {
+      "x": 49,
+      "y": 263,
+      "width": 755,
+      "height": 841
+    },
+    "sha256": "dd59fd5799e275c53577d1a8e916616e3728e44c6c18ed2c4019b875af4efb1e"
+  },
+  {
+    "id": "lerato-cafe",
+    "source": "05_bua_comprehension.png",
+    "crop": {
+      "x": 52,
+      "y": 430,
+      "width": 540,
+      "height": 423
+    },
+    "sha256": "faec74a9a3769b37c41598cb40d1048ef43e3c850a1764ede172bb18e373f2cf"
+  },
+  {
+    "id": "campus-roleplay",
+    "source": "08_bua_role_play.png",
+    "crop": {
+      "x": 49,
+      "y": 350,
+      "width": 764,
+      "height": 578
+    },
+    "sha256": "7fa3499ec374dd305d6a95ce57012b52edfd2c182820d732c21f5764e8e0f0d3"
+  },
+  {
+    "id": "phrase-classmates",
+    "source": "14_bua_phrase_builder.png",
+    "crop": {
+      "x": 39,
+      "y": 390,
+      "width": 774,
+      "height": 530
+    },
+    "sha256": "c64c41276ea09219586dd8e257791197f569e19ef15b21e01b787147ead89171"
+  },
+  {
+    "id": "water",
+    "source": "15_bua_picture_match.png",
+    "crop": {
+      "x": 70,
+      "y": 600,
+      "width": 300,
+      "height": 300
+    },
+    "sha256": "1cbb92227921ff64ba18b09c8a930aba53b7d9c5f0343f67755e53d716268562"
+  },
+  {
+    "id": "bread",
+    "source": "15_bua_picture_match.png",
+    "crop": {
+      "x": 466,
+      "y": 590,
+      "width": 320,
+      "height": 310
+    },
+    "sha256": "3630e38a39712389deac3db8e6afab22d32a7faa0c3de0558476af28af3c030b"
+  },
+  {
+    "id": "house",
+    "source": "15_bua_picture_match.png",
+    "crop": {
+      "x": 50,
+      "y": 1000,
+      "width": 350,
+      "height": 340
+    },
+    "sha256": "2ff2d1731cae3e8b2a37b419650e5ca7cf5d25e24712248f3fb2f89dd4e83b28"
+  },
+  {
+    "id": "family",
+    "source": "15_bua_picture_match.png",
+    "crop": {
+      "x": 450,
+      "y": 980,
+      "width": 340,
+      "height": 390
+    },
+    "sha256": "987d1faf050733ac0c1f18809779f3851f9b0a326f9a1931991bac860b70cc8f"
+  },
+  {
+    "id": "taxi-rank",
+    "source": "16_bua_branching_conversation.png",
+    "crop": {
+      "x": 34,
+      "y": 395,
+      "width": 796,
+      "height": 470
+    },
+    "sha256": "96583f423135e6fe84f13b4f53ddb34a35cabfc26d8ebb6fadda355f90b02f0b"
+  },
+  {
+    "id": "click-instructions",
+    "source": "18_bua_click_pronunciation.png",
+    "crop": {
+      "x": 63,
+      "y": 413,
+      "width": 726,
+      "height": 484
+    },
+    "sha256": "221819622474d9d4a7bce97aff5d19b623274e4b85c898697f44f11e07833ff2"
+  }
+]

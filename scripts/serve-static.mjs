@@ -32,8 +32,14 @@ const server = createServer(async (request, response) => {
     try {
       file = await stat(resolvedFilePath);
     } catch {
-      resolvedFilePath = `${filePath}.html`;
-      file = await stat(resolvedFilePath);
+      try {
+        resolvedFilePath = `${filePath}.html`;
+        file = await stat(resolvedFilePath);
+      } catch {
+        const lessonTemplate = relativePath.replace(/^lesson\/[^/]+\//, 'lesson/[lessonId]/');
+        resolvedFilePath = resolve(root, `${lessonTemplate}.html`);
+        file = await stat(resolvedFilePath);
+      }
     }
     if (!file.isFile()) {
       throw new Error('Not a file');
