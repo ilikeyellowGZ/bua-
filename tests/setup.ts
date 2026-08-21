@@ -16,3 +16,9 @@ jest.mock('react-native-reanimated', () => {
     useReducedMotion: jest.fn(() => false),
   };
 });
+
+jest.mock('@react-native-async-storage/async-storage', () =>
+  // Jest's official AsyncStorage mock is published as CommonJS.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+);

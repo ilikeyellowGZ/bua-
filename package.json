@@ -23,6 +23,7 @@
     "doctor": "npx expo-doctor@latest",
     "assets:extract": "node scripts/extract-approved-assets.mjs",
     "capture:components": "node scripts/capture-component-showcase.mjs",
+    "capture:product-slice": "node scripts/capture-product-slice.mjs",
     "env:prepare": "node scripts/prepare-env.mjs",
     "serve:dist": "node scripts/serve-static.mjs",
     "supabase:check": "node scripts/check-supabase.mjs",
