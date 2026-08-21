@@ -26,11 +26,12 @@ export function ChoiceCard({
   const accessibleName = [label, description, selected ? 'Selected' : undefined]
     .filter(Boolean)
     .join(' ');
-  const selectionAnimationProps = reduceMotion || Platform.OS === 'web'
-    ? {}
-    : {
-        entering: ZoomIn.duration(tokens.motion.standard).reduceMotion(ReduceMotion.System),
-      };
+  const selectionAnimationProps =
+    reduceMotion || Platform.OS === 'web'
+      ? {}
+      : {
+          entering: ZoomIn.duration(tokens.motion.standard).reduceMotion(ReduceMotion.System),
+        };
 
   return (
     <Pressable

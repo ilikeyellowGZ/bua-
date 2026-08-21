@@ -83,12 +83,12 @@ export const publicEnvSchema = z.object({
 **Interfaces:**
 - Produces: `UserProfile`, `Course`, `Unit`, `Lesson`, `Activity`, `Attempt`, `LessonCompletion`, `PronunciationResult`, `RolePlayTurn`, `ContentPack`, `SyncOperation`, `createLessonMachine()`, and `calculateLessonProgress()`.
 
-- [ ] **Step 1: Write failing schema and machine tests** for the exact seeded Neo/isiZulu content, eight-activity order, duplicate-submission guard, retry behavior, interruption restore, and normalized dictation scoring.
-- [ ] **Step 2: Run the three focused test files** and observe missing modules.
-- [ ] **Step 3: Implement Zod schemas and stable seeded IDs** with copy outside screen components.
-- [ ] **Step 4: Implement the explicit lesson state machine** including hydration, presentation, evaluation, feedback, interruption, offline, error, exit, and completion states.
-- [ ] **Step 5: Run domain tests and full unit suite** and verify green.
-- [ ] **Step 6: Commit and push** with `feat(domain): model Bua lesson content and progression`.
+- [x] **Step 1: Write failing schema and machine tests** for the exact seeded Neo/isiZulu content, eight-activity order, duplicate-submission guard, retry behavior, interruption restore, and normalized dictation scoring.
+- [x] **Step 2: Run the three focused test files** and observe missing modules.
+- [x] **Step 3: Implement Zod schemas and stable seeded IDs** with copy outside screen components.
+- [x] **Step 4: Implement the explicit lesson state machine** including hydration, presentation, evaluation, feedback, interruption, offline, error, exit, and completion states.
+- [x] **Step 5: Run domain tests and full unit suite** and verify green.
+- [x] **Step 6: Commit and push** with `feat(domain): model Bua lesson content and progression`.
 
 ### Task 4: Supabase Schema, RLS, and Idempotent Server Operations
 
