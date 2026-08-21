@@ -25,9 +25,11 @@
     "capture:components": "node scripts/capture-component-showcase.mjs",
     "env:prepare": "node scripts/prepare-env.mjs",
     "serve:dist": "node scripts/serve-static.mjs",
+    "supabase:check": "node scripts/check-supabase.mjs",
     "validate": "npm run format:check && npm run lint && npm run typecheck && npm test -- --runInBand"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
     "expo": "~57.0.15",
     "expo-constants": "~57.0.13",
     "expo-image": "~57.0.3",

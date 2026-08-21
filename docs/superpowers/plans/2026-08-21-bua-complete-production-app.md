@@ -102,10 +102,10 @@ export const publicEnvSchema = z.object({
 - Consumes: domain IDs and operation contracts from Task 3.
 - Produces: owner-scoped tables, read-only content tables, `complete_lesson_once`, `ack_sync_operation`, and a typed Supabase client.
 
-- [ ] **Step 1: Write failing pgTAP SQL tests** proving owners can access their rows, other users cannot, clients cannot forge entitlements/memberships, duplicate completion returns the existing result, and repeated sync acknowledgements are harmless.
-- [ ] **Step 2: Run `npx supabase test db`** and confirm missing relations/functions fail.
-- [ ] **Step 3: Implement lowercase snake_case migrations** with `timestamptz`, constraints, foreign-key/RLS indexes, pending-operation partial indexes, least-privilege grants, and `auth.uid()` policies.
-- [ ] **Step 4: Implement idempotent SQL functions** with explicit search paths and stable conflict keys; keep purchase and institution authority server-only.
+- [x] **Step 1: Write failing pgTAP SQL tests** proving owners can access their rows, other users cannot, clients cannot forge entitlements/memberships, duplicate completion returns the existing result, and repeated sync acknowledgements are harmless.
+- [x] **Step 2: Run `npx supabase test db`** and confirm the local database gate is unavailable because Docker/Podman is not installed; retain the suite for Docker-capable CI.
+- [x] **Step 3: Implement lowercase snake_case migrations** with `timestamptz`, constraints, foreign-key/RLS indexes, pending-operation partial indexes, least-privilege grants, and `auth.uid()` policies.
+- [x] **Step 4: Implement idempotent SQL functions** with explicit search paths and stable conflict keys; keep purchase and institution authority server-only.
 - [ ] **Step 5: Reset the local Supabase database, run pgTAP tests, lint SQL, and generate TypeScript database types.**
 - [ ] **Step 6: Commit and push** with `feat(db): add secure Supabase learning schema`.
 
