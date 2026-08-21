@@ -95,4 +95,7 @@ export function createSupabaseAuthRepository(): AuthRepository {
   };
 }
 
-export const authRepository: AuthRepository = createDemoAuthRepository();
+export const authRepository: AuthRepository =
+  process.env.EXPO_PUBLIC_DEMO_MODE === 'false'
+    ? createSupabaseAuthRepository()
+    : createDemoAuthRepository();

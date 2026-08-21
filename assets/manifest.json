@@ -1,0 +1,11 @@
+{
+  "source": "bua_logo_and_app_icon_sheet.png",
+  "crop": {
+    "x": 82,
+    "y": 575,
+    "width": 276,
+    "height": 266
+  },
+  "boardPixelsReplacedWith": "#10243B",
+  "sha256": "7ebb04ecc19c01e8276f9df9d28741b137e36f1f54d3a4f342af7f62714e80c1"
+}

@@ -1,0 +1,30 @@
+name: Bua quality gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.0
+          cache: npm
+      - run: npm ci
+      - run: npm run assets:extract
+      - run: npm run validate
+      - name: Verify static web export
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: https://bua-ci.supabase.co
+          EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_only_abcdefghijklmnopqrstuvwxyz
+          EXPO_PUBLIC_APP_ENV: test
+          EXPO_PUBLIC_DEMO_MODE: 'true'
+        run: npx expo export --platform web --output-dir dist

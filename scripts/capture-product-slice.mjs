@@ -6,8 +6,11 @@ import { chromium } from '@playwright/test';
 const routes = [
   { path: '/', ready: 'Speak. Connect. Belong.', file: '01-welcome-390x844.png' },
   { path: '/language', ready: 'What would you like to speak?', file: '11-language-390x844.png' },
+  { path: '/routine', ready: 'Make Bua fit your day', file: '12-routine-390x844.png' },
+  { path: '/placement', ready: 'Where should we begin?', file: '13-placement-390x844.png' },
   { path: '/goal', ready: 'What would you like to do first?', file: '02-goal-390x844.png' },
   { path: '/learn', ready: 'Sawubona, Neo', file: '03-learn-390x844.png' },
+  { path: '/practice', ready: 'Explore', file: '10-explore-390x844.png' },
 ];
 
 const browser = await chromium.launch({ channel: 'msedge', headless: true });
