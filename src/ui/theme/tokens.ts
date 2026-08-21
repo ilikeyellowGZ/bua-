@@ -1,0 +1,58 @@
+export const theme = {
+  color: {
+    paper: '#FAF7EF',
+    surface: '#FFFFFF',
+    ink: '#14263D',
+    textMuted: '#5F6C78',
+    sun: '#F4B942',
+    sunPressed: '#DEA230',
+    aloe: '#2B9C91',
+    aloePressed: '#218178',
+    clay: '#EF765F',
+    danger: '#C94D45',
+    border: '#DDD9CF',
+    disabledSurface: '#ECE9E2',
+    disabledText: '#9A9A95',
+    darkLesson: '#10243B',
+    darkLessonSurface: '#18334F',
+  },
+  space: {
+    0: 0,
+    0.5: 4,
+    1: 8,
+    1.5: 12,
+    2: 16,
+    3: 24,
+    4: 32,
+    5: 40,
+    6: 48,
+    8: 64,
+  },
+  radius: {
+    small: 12,
+    medium: 20,
+    large: 32,
+    pill: 999,
+  },
+  depth: {
+    card: '0 8px 24px rgba(20, 38, 61, 0.08)',
+  },
+  typography: {
+    display: { fontSize: 56, lineHeight: 64, fontWeight: '800' as const },
+    h1: { fontSize: 40, lineHeight: 48, fontWeight: '800' as const },
+    h2: { fontSize: 32, lineHeight: 40, fontWeight: '700' as const },
+    h3: { fontSize: 24, lineHeight: 32, fontWeight: '700' as const },
+    bodyLarge: { fontSize: 20, lineHeight: 28, fontWeight: '600' as const },
+    body: { fontSize: 17, lineHeight: 24, fontWeight: '500' as const },
+    bodySmall: { fontSize: 15, lineHeight: 22, fontWeight: '500' as const },
+    caption: { fontSize: 13, lineHeight: 18, fontWeight: '600' as const },
+  },
+  motion: {
+    press: 120,
+    standard: 240,
+    page: 480,
+    celebrationMaximum: 900,
+  },
+} as const;
+
+export type BuaTheme = typeof theme;

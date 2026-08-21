@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Bua",
+    "slug": "bua",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "bua",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.bua.learn"
+    },
+    "android": {
+      "package": "com.bua.learn",
+      "predictiveBackGestureEnabled": true
+    },
+    "web": {
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FAF7EF",
+          "resizeMode": "contain"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

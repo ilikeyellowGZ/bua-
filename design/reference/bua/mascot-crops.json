@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "coordinateSystem": "pixel rectangles measured from the top-left source origin",
+  "extractionStatus": "blocked-pending-transparent-source",
+  "reason": "Both mascot boards are RGB PNGs without alpha; the visible checkerboard is baked into the pixels.",
+  "sources": [
+    {
+      "file": "thandi_full_body_sprite_sheet.png",
+      "size": { "width": 1448, "height": 1086 },
+      "grid": { "columns": 4, "rows": 3 },
+      "crops": [
+        { "id": "full-neutral-book", "x": 0, "y": 0, "width": 362, "height": 362 },
+        { "id": "full-wave", "x": 362, "y": 0, "width": 362, "height": 362 },
+        { "id": "full-point-right", "x": 724, "y": 0, "width": 362, "height": 362 },
+        { "id": "full-point-left", "x": 1086, "y": 0, "width": 362, "height": 362 },
+        { "id": "full-reading", "x": 0, "y": 362, "width": 362, "height": 362 },
+        { "id": "full-headphones", "x": 362, "y": 362, "width": 362, "height": 362 },
+        { "id": "full-microphone", "x": 724, "y": 362, "width": 362, "height": 362 },
+        { "id": "full-celebrate", "x": 1086, "y": 362, "width": 362, "height": 362 },
+        { "id": "full-thinking", "x": 0, "y": 724, "width": 362, "height": 362 },
+        { "id": "full-worried", "x": 362, "y": 724, "width": 362, "height": 362 },
+        { "id": "full-thumbs-up", "x": 724, "y": 724, "width": 362, "height": 362 },
+        { "id": "full-walking", "x": 1086, "y": 724, "width": 362, "height": 362 }
+      ]
+    },
+    {
+      "file": "thandi_expression_sprite_sheet.png",
+      "size": { "width": 1254, "height": 1254 },
+      "grid": { "columns": 4, "rows": 4, "boundaries": [0, 314, 627, 941, 1254] },
+      "crops": [
+        { "id": "face-calm", "x": 0, "y": 0, "width": 314, "height": 314 },
+        { "id": "face-sleepy", "x": 314, "y": 0, "width": 313, "height": 314 },
+        { "id": "face-eyes-closed", "x": 627, "y": 0, "width": 314, "height": 314 },
+        { "id": "face-happy-open", "x": 941, "y": 0, "width": 313, "height": 314 },
+        { "id": "face-headphones", "x": 0, "y": 314, "width": 314, "height": 313 },
+        { "id": "face-surprised-small", "x": 314, "y": 314, "width": 313, "height": 313 },
+        { "id": "face-excited", "x": 627, "y": 314, "width": 314, "height": 313 },
+        { "id": "face-laughing", "x": 941, "y": 314, "width": 313, "height": 313 },
+        { "id": "face-thinking", "x": 0, "y": 627, "width": 314, "height": 314 },
+        { "id": "face-shocked", "x": 314, "y": 627, "width": 313, "height": 314 },
+        { "id": "face-thumbs-up", "x": 627, "y": 627, "width": 314, "height": 314 },
+        { "id": "face-celebrate", "x": 941, "y": 627, "width": 313, "height": 314 },
+        { "id": "face-idea", "x": 0, "y": 941, "width": 314, "height": 313 },
+        { "id": "face-concerned", "x": 314, "y": 941, "width": 313, "height": 313 },
+        { "id": "face-yawning", "x": 627, "y": 941, "width": 314, "height": 313 },
+        { "id": "face-crown", "x": 941, "y": 941, "width": 313, "height": 313 }
+      ]
+    }
+  ]
+}

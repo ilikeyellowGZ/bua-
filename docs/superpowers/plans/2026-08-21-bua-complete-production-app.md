@@ -37,10 +37,10 @@
 **Interfaces:**
 - Produces: `envSchema`, `getPublicEnv()`, `theme`, a bootable Expo Router shell, the immutable reference manifest, and documented asset gaps.
 
-- [ ] **Step 1: Create the pinned Expo SDK 57 manifests and install dependencies fail-closed** using `npm install --ignore-scripts`, inspect every package declaring an install script, approve only required Expo/native build scripts, and verify the committed lockfile with `npm ci --ignore-scripts`.
-- [ ] **Step 2: Write the failing environment test** asserting that missing public variables yield safe variable-name errors and values are never included.
-- [ ] **Step 3: Run `npm test -- tests/config/env.test.ts --runInBand`** and confirm failure because `getPublicEnv` does not exist.
-- [ ] **Step 4: Create the minimal router shell and environment reader** with strict compiler options, scripts for format/lint/type/test/start/build, and this Zod contract:
+- [x] **Step 1: Create the pinned Expo SDK 57 manifests and install dependencies fail-closed** using `npm install --ignore-scripts`, inspect every package declaring an install script, approve only required Expo/native build scripts, and verify the committed lockfile with `npm ci --ignore-scripts`.
+- [x] **Step 2: Write the failing environment test** asserting that missing public variables yield safe variable-name errors and values are never included.
+- [x] **Step 3: Run `npm test -- tests/config/env.test.ts --runInBand`** and confirm failure because `getPublicEnv` does not exist.
+- [x] **Step 4: Create the minimal router shell and environment reader** with strict compiler options, scripts for format/lint/type/test/start/build, and this Zod contract:
 
 ```ts
 export const publicEnvSchema = z.object({
@@ -51,9 +51,9 @@ export const publicEnvSchema = z.object({
 });
 ```
 
-- [ ] **Step 5: Relocate and hash all twenty-three immutable references** and record dimensions, SHA-256, alpha/color type, measured layout regions, crop rectangles, and extraction limitations without changing source bytes.
-- [ ] **Step 6: Run `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm audit signatures`, and the focused test**; verify every command passes or document a registry that does not publish signatures without weakening the release gate.
-- [ ] **Step 7: Commit and push** with `chore: establish Bua Expo foundation and reference contract`.
+- [x] **Step 5: Relocate and hash all twenty-three immutable references** and record dimensions, SHA-256, alpha/color type, measured layout regions, crop rectangles, and extraction limitations without changing source bytes.
+- [x] **Step 6: Run `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm audit signatures`, and the focused test**; verify every command passes or document a registry that does not publish signatures without weakening the release gate.
+- [x] **Step 7: Commit and push** with `chore: establish Bua Expo foundation and reference contract`.
 
 ### Task 2: Brand Assets, Design Tokens, Motion, and Shared Controls
 

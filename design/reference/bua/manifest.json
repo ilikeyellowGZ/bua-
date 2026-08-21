@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "verifiedOn": "2026-08-21",
+  "immutability": "SHA-256 values were measured before and after relocation and matched exactly.",
+  "pngEncoding": {
+    "bitDepth": 8,
+    "colorType": 2,
+    "colorTypeDescription": "truecolor RGB",
+    "alphaChannel": false
+  },
+  "files": [
+    {
+      "name": "01_bua_welcome.png",
+      "kind": "screen",
+      "width": 853,
+      "height": 1844,
+      "bytes": 1166543,
+      "sha256": "39437b51fab38d4fd6499077e37b66218e1ce3d3346591386c477cb04ebdf53e"
+    },
+    {
+      "name": "02_bua_goal_onboarding.png",
+      "kind": "screen",
+      "width": 887,
+      "height": 1774,
+      "bytes": 1089079,
+      "sha256": "378afb50ec9fbf6ec93012ee9ed549eaea53e5f803f2d6ea8d9ce881463f67a5"
+    },
+    {
+      "name": "03_bua_home_learning_path.png",
+      "kind": "screen",
+      "width": 853,
+      "height": 1844,
+      "bytes": 1272711,
+      "sha256": "e371862e6c922db2917d513bc9a5784231e3256dfa3987747aef7fcd6c17eb7f"
+    },
+    {
+      "name": "04_bua_listening_story.png",
+      "kind": "screen",
+      "width": 853,
+      "height": 1844,
+      "bytes": 1602569,
+      "sha256": "c9ee6134fb07aa9cc24ab219ffc885a6ff51ae2b809dbfbd36a503e5d03473ce"
+    },
+    {
+      "name": "05_bua_comprehension.png",
+      "kind": "screen",
+      "width": 852,
+      "height": 1846,
+      "bytes": 1267570,
+      "sha256": "6126b5fed36c982ca0a3270731ee3b01a650d07f2a4dab9839f632d5dcf45f03"
+    },
+    {
+      "name": "06_bua_sound_focus.png",
+      "kind": "screen",
+      "width": 864,
+      "height": 1821,
+      "bytes": 1113919,
+      "sha256": "91ef6b83ddd4ab83952cbba07df14aaa7e9a6bcdd10745972cd7a48c6afbbd5f"
+    },
+    {
+      "name": "07_bua_speaking_feedback.png",
+      "kind": "screen",
+      "width": 864,
+      "height": 1821,
+      "bytes": 1142286,
+      "sha256": "ddd4c781bbe371b1de98313c1ee811cd13021edcb6d18858d3d37d908dfb91f0"
+    },
+    {
+      "name": "08_bua_role_play.png",
+      "kind": "screen",
+      "width": 862,
+      "height": 1824,
+      "bytes": 1502328,
+      "sha256": "9b4e71b55026316fa06f5bdef037edd6460c71bcb31acb763a298b4bec7421db"
+    },
+    {
+      "name": "09_bua_lesson_complete.png",
+      "kind": "screen",
+      "width": 852,
+      "height": 1846,
+      "bytes": 1391424,
+      "sha256": "986366808e9850238e279328203b5ad6cdedfc8002f406e4d95defa9f078d22e"
+    },
+    {
+      "name": "10_bua_explore_library.png",
+      "kind": "screen",
+      "width": 853,
+      "height": 1844,
+      "bytes": 1568467,
+      "sha256": "2011410399b7c491a4b319d6b059d82345c90c2fc835f981dde86b306bb68953"
+    },
+    {
+      "name": "11_bua_language_onboarding.png",
+      "kind": "screen",
+      "width": 853,
+      "height": 1844,
+      "bytes": 1139447,
+      "sha256": "4be2eee1c6ee6b2d7b7c71db3ef1c0158503e911712a325e02bd3486a39e272e"
+    },
+    {
+      "name": "12_bua_daily_routine_onboarding.png",
+      "kind": "screen",
+      "width": 853,
+      "height": 1844,
+      "bytes": 1206655,
+      "sha256": "3029c8cd9e412775bc72a0f364ff2c2d8c28572e690b0b1b54f1861ba463ed7b"
+    },
+    {
+      "name": "13_bua_level_placement.png",
+      "kind": "screen",
+      "width": 853,
+      "height": 1844,
+      "bytes": 1243337,
+      "sha256": "997a8dc833b19525c8a503762c9cf2da1c5ea7031cfcfbb618e364aa0eb9ee5d"
+    },
+    {
+      "name": "14_bua_phrase_builder.png",
+      "kind": "screen",
+      "width": 853,
+      "height": 1844,
+      "bytes": 1255355,
+      "sha256": "7abe69a68a42c0e27a429159fca2b161380c80a59e5114547d8ec06068defba9"
+    },
+    {
+      "name": "15_bua_picture_match.png",
+      "kind": "screen",
+      "width": 852,
+      "height": 1846,
+      "bytes": 1616577,
+      "sha256": "d281dce3746f597c469d6e4ca7b576101699d32fc40123c7124510ca6880880d"
+    },
+    {
+      "name": "16_bua_branching_conversation.png",
+      "kind": "screen",
+      "width": 863,
+      "height": 1822,
+      "bytes": 1488126,
+      "sha256": "3c6c66ac855d9fed727e7265d9800adc5078ce0f286e382b24803e30a0016247"
+    },
+    {
+      "name": "17_bua_listen_and_type.png",
+      "kind": "screen",
+      "width": 853,
+      "height": 1844,
+      "bytes": 1352987,
+      "sha256": "0e2343e9882d537857ebf7fab63a80e6028816adcd0f02151ad112b92b414588"
+    },
+    {
+      "name": "18_bua_click_pronunciation.png",
+      "kind": "screen",
+      "width": 852,
+      "height": 1846,
+      "bytes": 1486200,
+      "sha256": "9e29091075d13f5fe01d8f64dd2f41dfcf2b498ff040df55de71db22934064df"
+    },
+    {
+      "name": "19_bua_premium_paywall.png",
+      "kind": "screen",
+      "width": 853,
+      "height": 1844,
+      "bytes": 1294617,
+      "sha256": "9ff62fa730fecf80b1a65f8a10bb18fc3e7e961aa0ba79649326ecd24592c861"
+    },
+    {
+      "name": "20_bua_premium_checkout.png",
+      "kind": "screen",
+      "width": 853,
+      "height": 1844,
+      "bytes": 1252097,
+      "sha256": "1c126abe3609588eab635caa4cd570fe4d84dae3f49a3ddf0df39177dba61bf9"
+    },
+    {
+      "name": "bua_logo_and_app_icon_sheet.png",
+      "kind": "brand-board",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 1346059,
+      "sha256": "89d75ec9c092e69882f21ac69c7275f5bf03dd5847f27cf989f5256fea00297d"
+    },
+    {
+      "name": "thandi_expression_sprite_sheet.png",
+      "kind": "mascot-board",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2015418,
+      "sha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1"
+    },
+    {
+      "name": "thandi_full_body_sprite_sheet.png",
+      "kind": "mascot-board",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 1769244,
+      "sha256": "9ae0ff836e2e23ab5fcbae61026e30d67efe214de8b4ce4c9a473052ec81033b"
+    }
+  ]
+}

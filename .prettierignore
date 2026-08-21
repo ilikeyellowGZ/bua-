@@ -1,0 +1,10 @@
+.expo
+artifacts
+coverage
+design/reference
+dist
+node_modules
+*.png
+Bua_Codex_Production_Master_Prompt.md
+docs/superpowers
+prompts
