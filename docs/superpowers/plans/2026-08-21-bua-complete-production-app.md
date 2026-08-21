@@ -119,10 +119,10 @@ export const publicEnvSchema = z.object({
 **Interfaces:**
 - Produces: `ProgressRepository`, `SyncRepository`, `saveAttempt(attempt)`, `completeLesson(input)`, `enqueueSync(operation)`, and `reconcilePendingOperations(signal)`.
 
-- [ ] **Step 1: Write failing integration tests** for local-first writes, process restart restoration, exponential retry, cancellation, outbox deduplication, and server acknowledgement.
-- [ ] **Step 2: Run the focused sync test** and confirm missing repositories fail.
-- [ ] **Step 3: Implement SQLite migrations and transactions** for content, drafts, runs, attempts, completions, downloads, reminders, entitlement cache, and outbox.
-- [ ] **Step 4: Implement Supabase reconciliation** using atomic upserts/RPC calls and explicit conflict rules from the specification.
+- [x] **Step 1: Write failing integration tests** for local-first writes, process restart restoration, exponential retry, cancellation, outbox deduplication, and server acknowledgement.
+- [x] **Step 2: Run the focused sync test** and confirm missing repositories fail.
+- [x] **Step 3: Implement SQLite migrations and transactions** for content, drafts, runs, attempts, completions, downloads, reminders, entitlement cache, and outbox.
+- [x] **Step 4: Implement Supabase reconciliation** using atomic upserts/RPC calls and explicit conflict rules from the specification.
 - [ ] **Step 5: Run sync tests twice against a fresh and migrated database** plus type/lint checks.
 - [ ] **Step 6: Commit and push** with `feat(sync): persist learning offline and reconcile safely`.
 
