@@ -20,6 +20,8 @@ const scenes = [
   ['family', '15_bua_picture_match.png', 450, 980, 340, 390],
   ['taxi-rank', '16_bua_branching_conversation.png', 34, 395, 796, 470],
   ['click-instructions', '18_bua_click_pronunciation.png', 63, 413, 726, 484],
+  ['premium-offer-hero', '19_bua_premium_paywall.png', 180, 55, 500, 390],
+  ['premium-checkout-hero', '20_bua_premium_checkout.png', 135, 105, 550, 220],
 ];
 
 mkdirSync(destination, { recursive: true });

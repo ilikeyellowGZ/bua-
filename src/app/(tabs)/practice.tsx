@@ -6,6 +6,7 @@ export default function PracticeRoute() {
     <PracticeScreen
       onFeatured={() => router.push('/lesson/lesson-introduce-yourself/conversation')}
       onSoundFocus={() => router.push('/lesson/lesson-introduce-yourself/sound-focus')}
+      onPremium={() => router.push('/offer')}
     />
   );
 }

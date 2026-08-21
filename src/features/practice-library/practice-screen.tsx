@@ -1,11 +1,16 @@
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Mascot } from '@/ui/mascot/mascot';
+import { BuaButton } from '@/ui/controls/bua-button';
 import { useTheme } from '@/ui/theme/theme-provider';
 
-type PracticeScreenProps = { onFeatured: () => void; onSoundFocus: () => void };
+type PracticeScreenProps = {
+  onFeatured: () => void;
+  onSoundFocus: () => void;
+  onPremium?: () => void;
+};
 
-export function PracticeScreen({ onFeatured, onSoundFocus }: PracticeScreenProps) {
+export function PracticeScreen({ onFeatured, onSoundFocus, onPremium }: PracticeScreenProps) {
   const tokens = useTheme();
   return (
     <ScrollView
@@ -108,6 +113,9 @@ export function PracticeScreen({ onFeatured, onSoundFocus }: PracticeScreenProps
           <Text style={[tokens.typography.h3, { color: tokens.color.aloe }]}>⇩</Text>
         </Pressable>
       ))}
+      {onPremium ? (
+        <BuaButton label="Explore Bua Premium" onPress={onPremium} variant="outline" />
+      ) : null}
     </ScrollView>
   );
 }

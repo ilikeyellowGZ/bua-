@@ -108,5 +108,27 @@
       "height": 484
     },
     "sha256": "221819622474d9d4a7bce97aff5d19b623274e4b85c898697f44f11e07833ff2"
+  },
+  {
+    "id": "premium-offer-hero",
+    "source": "19_bua_premium_paywall.png",
+    "crop": {
+      "x": 180,
+      "y": 55,
+      "width": 500,
+      "height": 390
+    },
+    "sha256": "964b01b8b855dcd0aab76ffa7a2b5f708b6ca44005556937bfc8b8e649ba3f62"
+  },
+  {
+    "id": "premium-checkout-hero",
+    "source": "20_bua_premium_checkout.png",
+    "crop": {
+      "x": 135,
+      "y": 105,
+      "width": 550,
+      "height": 220
+    },
+    "sha256": "2d17881baa6d1c2c353cefe2c1874d1622ffb9cde19eb16bd97603777d8fba24"
   }
 ]
