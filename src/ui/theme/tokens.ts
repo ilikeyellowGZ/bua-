@@ -15,6 +15,8 @@ export const theme = {
     disabledText: '#9A9A95',
     darkLesson: '#10243B',
     darkLessonSurface: '#18334F',
+    selectionSurface: '#EFF8F6',
+    feedbackSurface: '#F7FBFA',
   },
   space: {
     0: 0,
@@ -36,6 +38,7 @@ export const theme = {
   },
   depth: {
     card: '0 8px 24px rgba(20, 38, 61, 0.08)',
+    button: 4,
   },
   typography: {
     display: { fontSize: 56, lineHeight: 64, fontWeight: '800' as const },
@@ -48,10 +51,13 @@ export const theme = {
     caption: { fontSize: 13, lineHeight: 18, fontWeight: '600' as const },
   },
   motion: {
-    press: 120,
-    standard: 240,
-    page: 480,
-    celebrationMaximum: 900,
+    instant: 0,
+    fast: 140,
+    standard: 220,
+    emphasis: 320,
+    celebration: 520,
+    stagger: 45,
+    pressScale: 0.985,
   },
 } as const;
 

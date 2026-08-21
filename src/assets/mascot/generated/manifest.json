@@ -1,0 +1,455 @@
+{
+  "schemaVersion": 1,
+  "method": "Crop measured rectangles, then clear only border-connected near-neutral board pixels (RGB minimum >= 238; channel spread <= 8). Foreground RGB is never rewritten.",
+  "generatedAt": "reproducible-build-step",
+  "sprites": [
+    {
+      "id": "full-neutral-book",
+      "source": "thandi_full_body_sprite_sheet.png",
+      "sourceSha256": "9ae0ff836e2e23ab5fcbae61026e30d67efe214de8b4ce4c9a473052ec81033b",
+      "rect": {
+        "id": "full-neutral-book",
+        "x": 0,
+        "y": 0,
+        "width": 362,
+        "height": 362
+      },
+      "output": "full-neutral-book.png",
+      "outputSha256": "efe6f0bde3e3b1f54f1f7b0b86d60b35331a0fd6991edbc3fc830734aee3bf42",
+      "transparentPixels": 76732,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "full-wave",
+      "source": "thandi_full_body_sprite_sheet.png",
+      "sourceSha256": "9ae0ff836e2e23ab5fcbae61026e30d67efe214de8b4ce4c9a473052ec81033b",
+      "rect": {
+        "id": "full-wave",
+        "x": 362,
+        "y": 0,
+        "width": 362,
+        "height": 362
+      },
+      "output": "full-wave.png",
+      "outputSha256": "623bc0f6b21cb8c7d3842d32a46a5e0a594c05de5a67db82a7150cf39fc91dfe",
+      "transparentPixels": 76704,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "full-point-right",
+      "source": "thandi_full_body_sprite_sheet.png",
+      "sourceSha256": "9ae0ff836e2e23ab5fcbae61026e30d67efe214de8b4ce4c9a473052ec81033b",
+      "rect": {
+        "id": "full-point-right",
+        "x": 724,
+        "y": 0,
+        "width": 362,
+        "height": 362
+      },
+      "output": "full-point-right.png",
+      "outputSha256": "6bd58c3cd0121333e3132009a261d05ab879c76d3696b00fb3fc812e835380e0",
+      "transparentPixels": 78683,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "full-point-left",
+      "source": "thandi_full_body_sprite_sheet.png",
+      "sourceSha256": "9ae0ff836e2e23ab5fcbae61026e30d67efe214de8b4ce4c9a473052ec81033b",
+      "rect": {
+        "id": "full-point-left",
+        "x": 1086,
+        "y": 0,
+        "width": 362,
+        "height": 362
+      },
+      "output": "full-point-left.png",
+      "outputSha256": "f39dfa837053043b8b5cb9159eccb30f7af14841a3b381566628d2d7a4b252e2",
+      "transparentPixels": 78467,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "full-reading",
+      "source": "thandi_full_body_sprite_sheet.png",
+      "sourceSha256": "9ae0ff836e2e23ab5fcbae61026e30d67efe214de8b4ce4c9a473052ec81033b",
+      "rect": {
+        "id": "full-reading",
+        "x": 0,
+        "y": 362,
+        "width": 362,
+        "height": 362
+      },
+      "output": "full-reading.png",
+      "outputSha256": "ae8d41b0329f6f9bfb9c251bec72aaf12165fde0091361b274a52e225acc4d9a",
+      "transparentPixels": 80677,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "full-headphones",
+      "source": "thandi_full_body_sprite_sheet.png",
+      "sourceSha256": "9ae0ff836e2e23ab5fcbae61026e30d67efe214de8b4ce4c9a473052ec81033b",
+      "rect": {
+        "id": "full-headphones",
+        "x": 362,
+        "y": 362,
+        "width": 362,
+        "height": 362
+      },
+      "output": "full-headphones.png",
+      "outputSha256": "4cb4982563d06c2f26a32a6e6d5517a46a1e8332c72370341a30ffd1ad7ed73a",
+      "transparentPixels": 78114,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "full-microphone",
+      "source": "thandi_full_body_sprite_sheet.png",
+      "sourceSha256": "9ae0ff836e2e23ab5fcbae61026e30d67efe214de8b4ce4c9a473052ec81033b",
+      "rect": {
+        "id": "full-microphone",
+        "x": 724,
+        "y": 362,
+        "width": 362,
+        "height": 362
+      },
+      "output": "full-microphone.png",
+      "outputSha256": "283a2a93585a1c03c517c6635d8605f32190918121c9b51dc8b4b2db3edc1998",
+      "transparentPixels": 79199,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "full-celebrate",
+      "source": "thandi_full_body_sprite_sheet.png",
+      "sourceSha256": "9ae0ff836e2e23ab5fcbae61026e30d67efe214de8b4ce4c9a473052ec81033b",
+      "rect": {
+        "id": "full-celebrate",
+        "x": 1086,
+        "y": 362,
+        "width": 362,
+        "height": 362
+      },
+      "output": "full-celebrate.png",
+      "outputSha256": "80ccbc50faadfc4c2f6f5c221aa3c8b0d84c776cdf6f78165f758e7691fa5f54",
+      "transparentPixels": 78868,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "full-thinking",
+      "source": "thandi_full_body_sprite_sheet.png",
+      "sourceSha256": "9ae0ff836e2e23ab5fcbae61026e30d67efe214de8b4ce4c9a473052ec81033b",
+      "rect": {
+        "id": "full-thinking",
+        "x": 0,
+        "y": 724,
+        "width": 362,
+        "height": 362
+      },
+      "output": "full-thinking.png",
+      "outputSha256": "9fa922740b3d9a7fc8922c8e5079a7d1ca68133650dd51b451a784b45601ce24",
+      "transparentPixels": 82671,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "full-worried",
+      "source": "thandi_full_body_sprite_sheet.png",
+      "sourceSha256": "9ae0ff836e2e23ab5fcbae61026e30d67efe214de8b4ce4c9a473052ec81033b",
+      "rect": {
+        "id": "full-worried",
+        "x": 362,
+        "y": 724,
+        "width": 362,
+        "height": 362
+      },
+      "output": "full-worried.png",
+      "outputSha256": "9ef2682959f3a47b1b6e182f467766d2cd4caab08a21391ee93c303738b38e44",
+      "transparentPixels": 82282,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "full-thumbs-up",
+      "source": "thandi_full_body_sprite_sheet.png",
+      "sourceSha256": "9ae0ff836e2e23ab5fcbae61026e30d67efe214de8b4ce4c9a473052ec81033b",
+      "rect": {
+        "id": "full-thumbs-up",
+        "x": 724,
+        "y": 724,
+        "width": 362,
+        "height": 362
+      },
+      "output": "full-thumbs-up.png",
+      "outputSha256": "7cae87bfb3ac67e123dc7b7c14b9c71e11380134badffbcc40bdd25a3d15c6bd",
+      "transparentPixels": 79347,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "full-walking",
+      "source": "thandi_full_body_sprite_sheet.png",
+      "sourceSha256": "9ae0ff836e2e23ab5fcbae61026e30d67efe214de8b4ce4c9a473052ec81033b",
+      "rect": {
+        "id": "full-walking",
+        "x": 1086,
+        "y": 724,
+        "width": 362,
+        "height": 362
+      },
+      "output": "full-walking.png",
+      "outputSha256": "09f110cd4812f1433253d72e1e13e98aeb5841fd8dc77597cbec78fc7855b54d",
+      "transparentPixels": 86079,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-calm",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-calm",
+        "x": 0,
+        "y": 0,
+        "width": 314,
+        "height": 314
+      },
+      "output": "face-calm.png",
+      "outputSha256": "aaf62b70931a07dbcc0ed3018176e965aa39765f574b4d47b9405b3e3b6b03c2",
+      "transparentPixels": 45042,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-sleepy",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-sleepy",
+        "x": 314,
+        "y": 0,
+        "width": 313,
+        "height": 314
+      },
+      "output": "face-sleepy.png",
+      "outputSha256": "a54bd0a3afbe442194e2836deeadf2891dd55051306525d243d518d5a1aba105",
+      "transparentPixels": 44771,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-eyes-closed",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-eyes-closed",
+        "x": 627,
+        "y": 0,
+        "width": 314,
+        "height": 314
+      },
+      "output": "face-eyes-closed.png",
+      "outputSha256": "9ff3f888df8002456d77692c39e0c2790ed0d2fe781ac8f57eb802d9af5cc1df",
+      "transparentPixels": 45240,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-happy-open",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-happy-open",
+        "x": 941,
+        "y": 0,
+        "width": 313,
+        "height": 314
+      },
+      "output": "face-happy-open.png",
+      "outputSha256": "af191e0bd32676e4b4e9a5e4bf91989c3f7780a1a5b679bdb352d2fcde224980",
+      "transparentPixels": 44432,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-headphones",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-headphones",
+        "x": 0,
+        "y": 314,
+        "width": 314,
+        "height": 313
+      },
+      "output": "face-headphones.png",
+      "outputSha256": "f9674a780854bc56a0052086d073c0a428ac1a0268f97016f5508774f00a4036",
+      "transparentPixels": 43037,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-surprised-small",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-surprised-small",
+        "x": 314,
+        "y": 314,
+        "width": 313,
+        "height": 313
+      },
+      "output": "face-surprised-small.png",
+      "outputSha256": "0191248018b7be6158f4c073ed7187bf7bef56859b640e8a6dca2126c3dca787",
+      "transparentPixels": 44344,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-excited",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-excited",
+        "x": 627,
+        "y": 314,
+        "width": 314,
+        "height": 313
+      },
+      "output": "face-excited.png",
+      "outputSha256": "1fdccd9ffd989e2304a6118ec92ad2058b49614829dc30d1ab5a347612b46746",
+      "transparentPixels": 44555,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-laughing",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-laughing",
+        "x": 941,
+        "y": 314,
+        "width": 313,
+        "height": 313
+      },
+      "output": "face-laughing.png",
+      "outputSha256": "e8e35091d802803157836028f4cb95676a258af58a873718c8c71250e8711685",
+      "transparentPixels": 43500,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-thinking",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-thinking",
+        "x": 0,
+        "y": 627,
+        "width": 314,
+        "height": 314
+      },
+      "output": "face-thinking.png",
+      "outputSha256": "9ac3a7844f623e797396fcbcf22a4035b24d2f054c8f1c8a90249275cdd83d6f",
+      "transparentPixels": 46230,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-shocked",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-shocked",
+        "x": 314,
+        "y": 627,
+        "width": 313,
+        "height": 314
+      },
+      "output": "face-shocked.png",
+      "outputSha256": "ee43b8d111f8488bcaeb093529ab52892bae5a72afc4f59cc7478fef3655ee86",
+      "transparentPixels": 45946,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-thumbs-up",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-thumbs-up",
+        "x": 627,
+        "y": 627,
+        "width": 314,
+        "height": 314
+      },
+      "output": "face-thumbs-up.png",
+      "outputSha256": "03e21b7b8d5eb20617b2059c931f73973dc31a98ab487379b35e5b05cefab811",
+      "transparentPixels": 44137,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-celebrate",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-celebrate",
+        "x": 941,
+        "y": 627,
+        "width": 313,
+        "height": 314
+      },
+      "output": "face-celebrate.png",
+      "outputSha256": "6e503f43471462ce8a61ad463e9d5d39996deaa997cbe4ec664c4e47440d1d88",
+      "transparentPixels": 42917,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-idea",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-idea",
+        "x": 0,
+        "y": 941,
+        "width": 314,
+        "height": 313
+      },
+      "output": "face-idea.png",
+      "outputSha256": "5e680800cd6bce6f04532f7b1a40c512dd4122b10d0caa391c99de43ab357e3d",
+      "transparentPixels": 44595,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-concerned",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-concerned",
+        "x": 314,
+        "y": 941,
+        "width": 313,
+        "height": 313
+      },
+      "output": "face-concerned.png",
+      "outputSha256": "79f0844db9fae27cedafa1d6ff81bcaf4f1f1152bc97a48ff4999f96d994d3a4",
+      "transparentPixels": 44719,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-yawning",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-yawning",
+        "x": 627,
+        "y": 941,
+        "width": 314,
+        "height": 313
+      },
+      "output": "face-yawning.png",
+      "outputSha256": "dc9d2256c0c2e9b789365d98edd3e591b6ce04346959598344f12a482e5cec6e",
+      "transparentPixels": 44424,
+      "foregroundRgbVerified": true
+    },
+    {
+      "id": "face-crown",
+      "source": "thandi_expression_sprite_sheet.png",
+      "sourceSha256": "ca09303c52d279e41f164ea5170f0e5071e29431498f6380c6cca9556f62ede1",
+      "rect": {
+        "id": "face-crown",
+        "x": 941,
+        "y": 941,
+        "width": 313,
+        "height": 313
+      },
+      "output": "face-crown.png",
+      "outputSha256": "ace9a21f60371fd2b4852f4838ec23b0a77d239f06e5d4207d4d52de835cbdc0",
+      "transparentPixels": 43358,
+      "foregroundRgbVerified": true
+    }
+  ]
+}

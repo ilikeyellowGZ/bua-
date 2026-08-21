@@ -21,6 +21,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "doctor": "npx expo-doctor@latest",
+    "assets:extract": "node scripts/extract-approved-assets.mjs",
+    "capture:components": "node scripts/capture-component-showcase.mjs",
     "env:prepare": "node scripts/prepare-env.mjs",
     "serve:dist": "node scripts/serve-static.mjs",
     "validate": "npm run format:check && npm run lint && npm run typecheck && npm test -- --runInBand"
@@ -46,16 +48,18 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "1.62.1",
     "@testing-library/react-native": "14.0.1",
     "@types/jest": "29.5.14",
+    "@types/pngjs": "^6.0.5",
     "@types/react": "~19.2.2",
-    "@playwright/test": "1.62.1",
     "babel-preset-expo": "57.0.7",
     "eslint": "9.39.5",
     "eslint-config-expo": "57.0.1",
     "eslint-import-resolver-typescript": "3.10.1",
     "jest": "29.7.0",
     "jest-expo": "57.0.4",
+    "pngjs": "^7.0.0",
     "prettier": "3.9.6",
     "react-test-renderer": "19.2.3",
     "typescript": "~6.0.3"
@@ -68,6 +72,9 @@
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1"
     },
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.ts"
+    ],
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}",
       "!src/app/**"

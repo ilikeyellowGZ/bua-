@@ -25,6 +25,8 @@ Bua feels like a warm, trustworthy illustrated conversation workbook made for ev
 | Disabled / text      | `color.disabledText`      | `#9A9A95` | Disabled labels                     |
 | Lesson / dark        | `color.darkLesson`        | `#10243B` | Immersive lesson canvas             |
 | Lesson / raised      | `color.darkLessonSurface` | `#18334F` | Dark lesson panels                  |
+| Selection / surface  | `color.selectionSurface`  | `#EFF8F6` | Selected choice fill                |
+| Feedback / surface   | `color.feedbackSurface`   | `#F7FBFA` | Feedback panel fill                 |
 
 ### Rules
 
@@ -84,18 +86,64 @@ Bua feels like a warm, trustworthy illustrated conversation workbook made for ev
 
 Shared product controls, lesson scaffolds, choice rows, feedback, progress, and mascot primitives will be added before their first implementation in checkpoint 2.
 
+### Theme Provider
+
+- **Structure:** a single typed context around the product tree.
+- **States:** the production Bua theme is always available; missing provider usage fails fast in development.
+- **Accessibility:** semantic tokens preserve the same meaning across every screen.
+
+### Bua Button
+
+- **Variants:** sun primary, ink primary, aloe secondary, and outline.
+- **States:** enabled, pressed, disabled, and loading. Pressed controls move down 2 points and scale to `0.985`; loading announces busy and retains its label.
+- **Accessibility:** button role, explicit accessible name, 52-point height, and at least 44 points in both axes.
+
+### Icon Button
+
+- **Structure:** centered icon content inside a circular or rounded target.
+- **States:** enabled, pressed, and disabled.
+- **Accessibility:** an explicit label is mandatory and the target is at least 44 by 44 points.
+
+### Choice Card
+
+- **Structure:** primary label, optional description, and explicit selected text/check state.
+- **States:** resting, pressed, selected, disabled.
+- **Accessibility:** radio semantics with checked state; selection never relies on aloe color alone.
+
+### Progress Header
+
+- **Structure:** close control, segmented progress track, and text/value progress semantics.
+- **States:** clamped from zero to total and complete.
+- **Accessibility:** labelled close action and a progressbar value with text such as “3 of 8”.
+
+### Feedback Panel
+
+- **Variants:** success, coaching, and error.
+- **Structure:** explicit title and supporting message.
+- **Accessibility:** announced as one alert; tone is communicated in words and not color alone.
+
+### Mascot
+
+- **Structure:** a typed pose selects only pixel-preserved sprites extracted from the supplied Thandi boards.
+- **States:** meaningful art has an image label; decorative art is hidden from assistive technology.
+- **Motion:** finite whole-image opacity/transform only. Sprites are never redrawn, traced, or regenerated.
+
 ## 6. Motion & Interaction
 
-| Type        | Duration       | Easing                          | Usage                              |
-| ----------- | -------------- | ------------------------------- | ---------------------------------- |
-| Press       | 120 ms         | ease-out                        | Pressed transform/opacity feedback |
-| Standard    | 240 ms         | ease-in-out                     | Selection and panel changes        |
-| Page        | 480 ms         | `cubic-bezier(0.16, 1, 0.3, 1)` | Route and hero entrance            |
-| Celebration | 900 ms maximum | composed spring/ease            | Finite completion delight          |
+| Token       | Duration | Usage                                        |
+| ----------- | -------- | -------------------------------------------- |
+| Instant     | 0 ms     | Deterministic and reduced-motion final state |
+| Fast        | 140 ms   | Press feedback                               |
+| Standard    | 220 ms   | Choice selection and screen transition       |
+| Emphasis    | 320 ms   | Important finite coaching feedback           |
+| Celebration | 520 ms   | Rare, finite completion delight              |
+| Stagger     | 45 ms    | Small finite sequence offset                 |
+| Press scale | 0.985    | Frequent tactile response                    |
 
 - Animate only opacity and transforms. Motion communicates navigation, progress, selection, feedback, or audio state.
 - Every transition is interruptible and every loop owns cleanup. Decorative continuous loops are prohibited.
-- Reduced motion keeps the identical final information and state while removing travel, parallax, pulse, and celebration sequences.
+- Screen entry is a 220 ms fade with 8 points of upward travel. Choice checks scale from 0.9 to 1 within the standard duration.
+- Reduced motion keeps the identical final information and state while removing travel, parallax, pulse, and celebration sequences. Deterministic test mode uses the same final-state contract.
 
 ## 7. Depth & Surface
 

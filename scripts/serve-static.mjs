@@ -27,16 +27,23 @@ const server = createServer(async (request, response) => {
   }
 
   try {
-    const file = await stat(filePath);
+    let resolvedFilePath = filePath;
+    let file;
+    try {
+      file = await stat(resolvedFilePath);
+    } catch {
+      resolvedFilePath = `${filePath}.html`;
+      file = await stat(resolvedFilePath);
+    }
     if (!file.isFile()) {
       throw new Error('Not a file');
     }
 
     response.writeHead(200, {
       'Cache-Control': 'no-store',
-      'Content-Type': contentTypes[extname(filePath)] ?? 'application/octet-stream',
+      'Content-Type': contentTypes[extname(resolvedFilePath)] ?? 'application/octet-stream',
     });
-    createReadStream(filePath).pipe(response);
+    createReadStream(resolvedFilePath).pipe(response);
   } catch {
     response.writeHead(404).end('Not found');
   }

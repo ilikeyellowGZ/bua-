@@ -2,11 +2,13 @@
 
 ## Blocking visual gaps
 
-### Mascot and brand transparency
+### Mascot and brand transparency — partially resolved
 
-The three asset boards are 8-bit truecolor RGB PNGs with no alpha channel. Their checkerboard pattern is baked into the source pixels. A rectangular crop can remain pixel-identical, but it would visibly render the checkerboard and cannot be placed faithfully on paper, navy, or illustrated scene surfaces.
+The three asset boards are 8-bit truecolor RGB PNGs with no alpha channel. Their checkerboard pattern is baked into the source pixels. The production prompt explicitly approves background removal from these boards, so the measured mascot rectangles are processed by `scripts/extract-approved-assets.mjs`.
 
-Decision: do not redraw, regenerate, trace, automatically remove the background, or ship checkerboard-backed crops. Crop rectangles are measured and retained in `design/reference/bua/mascot-crops.json`; product sprites remain blocked pending approved transparent source files or explicit approval for a reviewed masking process.
+Decision: crop rectangles remain fixed in `design/reference/bua/mascot-crops.json`. The extractor clears only border-connected near-neutral board pixels, never changes foreground RGB, writes lossless RGBA PNGs, and records hashes and transparent-pixel counts in the generated manifest. This resolves the visible board background without redrawing, regenerating, tracing, or substituting Thandi.
+
+Remaining limitation: the baked board has antialiased transition pixels rather than original alpha coverage, so faint neutral edge pixels may remain. A future original transparent source can replace the derived alpha while preserving the exact pose. Page-specific props that are absent from the approved boards (for example a standalone clock) remain gaps and must not be invented into Thandi.
 
 ### Scene layers
 

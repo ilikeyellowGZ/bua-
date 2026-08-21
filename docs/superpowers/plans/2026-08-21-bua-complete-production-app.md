@@ -66,12 +66,12 @@ export const publicEnvSchema = z.object({
 - Consumes: `theme` and approved mascot source map from Task 1.
 - Produces: `MotionContextValue`, `BuaButtonProps`, `ChoiceCardProps`, and `MascotProps` matching the product contract.
 
-- [ ] **Step 1: Write failing RNTL tests** for button enabled/disabled/loading/pressed semantics, selected choice state, minimum hit slop, mascot decorative behavior, and deterministic reduced-motion timing.
-- [ ] **Step 2: Run the focused tests** and verify imports fail.
-- [ ] **Step 3: Implement shared controls** using native components, `expo-image`, Reanimated UI-thread opacity/transform, interruptible callbacks, and no product logic timers.
-- [ ] **Step 4: Add deterministic motion mode** where idle loops freeze and screen transition durations become zero while final visible states remain identical.
-- [ ] **Step 5: Run shared-control, format, lint, and type checks** and inspect the welcome-sized component fixture.
-- [ ] **Step 6: Commit and push** with `feat(ui): add Bua design and motion primitives`.
+- [x] **Step 1: Write failing RNTL tests** for button enabled/disabled/loading/pressed semantics, selected choice state, minimum hit slop, mascot decorative behavior, and deterministic reduced-motion timing.
+- [x] **Step 2: Run the focused tests** and verify imports fail.
+- [x] **Step 3: Implement shared controls** using native components, `expo-image`, Reanimated UI-thread opacity/transform, interruptible callbacks, and no product logic timers.
+- [x] **Step 4: Add deterministic motion mode** where idle loops freeze and screen transition durations become zero while final visible states remain identical.
+- [x] **Step 5: Run shared-control, format, lint, and type checks** and inspect the welcome-sized component fixture.
+- [x] **Step 6: Commit and push** with `feat(ui): add Bua design and motion primitives`.
 
 ### Task 3: Validated Domain Content and Lesson State Machine
 
