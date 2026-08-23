@@ -1,4 +1,4 @@
-import { createDemoAuthRepository } from '@/features/auth/auth.repository';
+import { createDemoAuthRepository, createSupabaseAuthRepository } from '@/features/auth/auth.repository';
 
 describe('deterministic auth repository', () => {
   it('restores anonymous guest sessions without a route flash', async () => {
@@ -28,6 +28,52 @@ describe('deterministic auth repository', () => {
     await expect(repository.joinInstitution('bad')).rejects.toThrow(/institution code/i);
     await expect(repository.joinInstitution('BUA-DEMO')).resolves.toMatchObject({
       userId: 'demo-institution-neo',
+    });
+  });
+});
+
+describe('Supabase auth repository', () => {
+  it('starts Google OAuth with a native Bua callback', async () => {
+    const signInWithOAuth = jest.fn().mockResolvedValue({ data: { url: 'https://auth.test' } });
+    const openURL = jest.fn().mockResolvedValue(undefined);
+    const repository = createSupabaseAuthRepository({
+      client: {
+        auth: {
+          signInWithOAuth,
+        },
+      },
+      openURL,
+      platform: 'ios',
+    });
+
+    await repository.signInWithProvider('google');
+
+    expect(signInWithOAuth).toHaveBeenCalledWith({
+      provider: 'google',
+      options: { redirectTo: 'bua://', skipBrowserRedirect: true },
+    });
+    expect(openURL).toHaveBeenCalledWith('https://auth.test');
+  });
+
+  it('stores an OAuth redirect session without exposing the token', async () => {
+    const setSession = jest.fn().mockResolvedValue({
+      data: { session: { user: { id: 'user-1', is_anonymous: false } } },
+      error: null,
+    });
+    const repository = createSupabaseAuthRepository({
+      client: {
+        auth: {
+          setSession,
+        },
+      },
+    });
+
+    await expect(
+      repository.handleOAuthRedirect('bua://#access_token=access-token&refresh_token=refresh-token'),
+    ).resolves.toEqual({ userId: 'user-1', anonymous: false });
+    expect(setSession).toHaveBeenCalledWith({
+      access_token: 'access-token',
+      refresh_token: 'refresh-token',
     });
   });
 });

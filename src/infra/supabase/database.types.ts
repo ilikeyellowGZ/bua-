@@ -13,6 +13,7 @@ export type Database = {
           goal: 'colleagues' | 'family' | 'campus' | 'everyday' | null;
           daily_goal_minutes: number;
           streak_days: number;
+          onboarding_completed: boolean;
           created_at: Timestamp;
           updated_at: Timestamp;
         };
@@ -23,6 +24,7 @@ export type Database = {
           goal?: 'colleagues' | 'family' | 'campus' | 'everyday' | null;
           daily_goal_minutes?: number;
           streak_days?: number;
+          onboarding_completed?: boolean;
           created_at?: Timestamp;
           updated_at?: Timestamp;
         };

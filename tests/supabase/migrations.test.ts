@@ -8,6 +8,7 @@ describe('Supabase migration security contract', () => {
   const core = readMigration('202608210001_bua_core.sql');
   const rls = readMigration('202608210002_bua_rls.sql');
   const functions = readMigration('202608210003_bua_functions.sql');
+  const liveIdentity = readMigration('202608220001_live_identity.sql');
 
   it('uses timezone-aware timestamps, constraints, and indexed ownership keys', () => {
     expect(core).not.toMatch(/\btimestamp\b(?!tz)/);
@@ -55,5 +56,14 @@ describe('Supabase migration security contract', () => {
     expect(functions).toContain('owner_id = caller_id');
     expect(functions).toContain('acknowledged_at = coalesce(acknowledged_at, now())');
     expect(functions).toContain('revoke all on function');
+  });
+
+  it('creates exactly one profile for each auth user', () => {
+    expect(liveIdentity).toContain('alter table public.profiles add column onboarding_completed');
+    expect(liveIdentity).toContain('create or replace function public.handle_new_user()');
+    expect(liveIdentity).toContain("security definer set search_path = ''");
+    expect(liveIdentity).toContain('on conflict (id) do nothing');
+    expect(liveIdentity).toContain('create trigger on_auth_user_created');
+    expect(liveIdentity).toContain('after insert on auth.users');
   });
 });
