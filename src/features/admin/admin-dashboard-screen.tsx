@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { computeHealthStatus, type HealthStatus } from '@/features/admin/admin-health';
@@ -44,7 +44,35 @@ export function AdminDashboardScreen({
   const [snapshot, setSnapshot] = useState<AdminDashboardSnapshot | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const repository = await loadRepository();
+        const allowed = await repository.isAdmin();
+        if (cancelled) return;
+        if (!allowed) {
+          setState('denied');
+          return;
+        }
+        const data = await repository.getDashboardSnapshot();
+        if (!cancelled) {
+          setSnapshot(data);
+          setState('ready');
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setErrorMessage(error instanceof Error ? error.message : String(error));
+          setState('error');
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [loadRepository]);
+
+  const handleRefresh = async () => {
     setState('loading');
     try {
       const repository = await loadRepository();
@@ -60,11 +88,7 @@ export function AdminDashboardScreen({
       setErrorMessage(error instanceof Error ? error.message : String(error));
       setState('error');
     }
-  }, [loadRepository]);
-
-  useEffect(() => {
-    load();
-  }, [load]);
+  };
 
   return (
     <ScrollView
@@ -129,7 +153,7 @@ export function AdminDashboardScreen({
         </>
       ) : null}
 
-      <BuaButton label="Refresh" variant="outline" onPress={load} />
+      <BuaButton label="Refresh" variant="outline" onPress={handleRefresh} />
       <BuaButton label="Back" variant="outline" onPress={onBack} />
     </ScrollView>
   );

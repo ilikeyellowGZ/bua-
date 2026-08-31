@@ -4,6 +4,16 @@ import {
   type SupabaseMonitoringClient,
 } from '@/features/monitoring/monitoring';
 
+beforeEach(() => {
+  jest.spyOn(console, 'error').mockImplementation(() => undefined);
+  jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+  jest.spyOn(console, 'info').mockImplementation(() => undefined);
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
+});
+
 function mockClient() {
   const insert = jest.fn().mockResolvedValue({ error: null });
   const from = jest.fn().mockReturnValue({ insert });
