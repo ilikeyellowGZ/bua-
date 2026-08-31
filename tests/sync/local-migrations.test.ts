@@ -16,6 +16,8 @@ describe('local SQLite migrations', () => {
       'local_downloads',
       'local_reminders',
       'entitlement_cache',
+      'local_progress',
+      'local_review_schedule',
     ]) {
       expect(sql).toContain(`create table if not exists ${table}`);
     }

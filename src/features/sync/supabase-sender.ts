@@ -22,6 +22,14 @@ const completionPayloadSchema = z.object({
   completedAt: z.string().datetime(),
 });
 
+const profilePayloadSchema = z.object({
+  ownerId: z.string().uuid(),
+  xpAwarded: z.number().int().nonnegative(),
+  currentStreakDays: z.number().int().nonnegative(),
+  longestStreakDays: z.number().int().nonnegative(),
+  lastActivityLocalDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+});
+
 const jsonPayloadSchema = z.record(z.string(), z.json());
 
 function assertSuccess(result: { error: { message: string } | null }) {
@@ -73,6 +81,17 @@ export async function sendOperationToSupabase(
         p_lesson_id: completion.lessonId,
         p_active_learning_seconds: completion.activeLearningSeconds,
         p_completed_at: completion.completedAt,
+      }),
+    );
+  } else if (operation.kind === 'profile') {
+    const profile = profilePayloadSchema.parse(operation.payload);
+    assertSuccess(
+      await client.rpc('apply_progress_update', {
+        p_event_id: operation.id,
+        p_xp_awarded: profile.xpAwarded,
+        p_current_streak_days: profile.currentStreakDays,
+        p_longest_streak_days: profile.longestStreakDays,
+        p_last_activity_local_date: profile.lastActivityLocalDate,
       }),
     );
   } else if (operation.kind === 'purchase') {

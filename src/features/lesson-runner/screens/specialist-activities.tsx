@@ -166,9 +166,17 @@ export function RolePlayScreen({ onClose, onContinue }: ActivityScreenProps) {
 }
 
 export function LessonCompleteScreen({
+  activeMinutes,
+  activitiesCompleted,
+  currentStreakDays,
+  xpAwarded,
   onBackHome,
   onKeepLearning,
 }: {
+  activeMinutes: number;
+  activitiesCompleted: number;
+  currentStreakDays: number;
+  xpAwarded: number;
   onBackHome: () => void;
   onKeepLearning: () => void;
 }) {
@@ -199,16 +207,16 @@ export function LessonCompleteScreen({
           </View>
         </View>
         <Text style={[styles.minutes, { color: tokens.color.ink }]}>
-          12 <Text style={tokens.typography.h1}>min</Text>
+          {activeMinutes} <Text style={tokens.typography.h1}>min</Text>
         </Text>
         <Text style={[tokens.typography.body, styles.centerText, { color: tokens.color.aloe }]}>
           active learning
         </Text>
         <View style={styles.metrics}>
           {[
-            ['8', 'activities'],
-            ['5', 'phrases'],
-            ['4', 'day streak'],
+            [String(activitiesCompleted), 'activities'],
+            [String(xpAwarded), 'XP earned'],
+            [String(currentStreakDays), 'day streak'],
           ].map(([value, label]) => (
             <View key={label} style={styles.metric}>
               <Text style={[tokens.typography.h1, { color: tokens.color.aloe }]}>{value}</Text>

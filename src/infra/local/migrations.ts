@@ -96,4 +96,32 @@ export const localMigrations = [
       pragma user_version = 1;
     `,
   },
+  {
+    version: 2,
+    sql: `
+      create table if not exists local_progress (
+        owner_id text primary key not null,
+        total_xp integer not null default 0,
+        current_streak_days integer not null default 0,
+        longest_streak_days integer not null default 0,
+        last_activity_local_date text not null default '',
+        updated_at text not null
+      );
+
+      create table if not exists local_review_schedule (
+        owner_id text not null,
+        item_id text not null,
+        next_review_at text not null,
+        interval_days integer not null,
+        ease_factor real not null,
+        repetitions integer not null default 0,
+        updated_at text not null,
+        primary key (owner_id, item_id)
+      );
+      create index if not exists local_review_schedule_due_idx
+        on local_review_schedule (owner_id, next_review_at);
+
+      pragma user_version = 2;
+    `,
+  },
 ] as const;

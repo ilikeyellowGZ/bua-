@@ -5,13 +5,19 @@ import type {
   LocalSyncOperation,
 } from '@/infra/local/database';
 
-const pendingOperation = (
+export const syncOperationId = (
+  ownerId: string,
+  kind: LocalSyncOperation['kind'],
+  aggregateId: string,
+) => `${ownerId}:${kind}:${aggregateId}`;
+
+export const pendingOperation = (
   ownerId: string,
   kind: LocalSyncOperation['kind'],
   aggregateId: string,
   payload: Record<string, unknown>,
 ): LocalSyncOperation => ({
-  id: `${ownerId}:${kind}:${aggregateId}`,
+  id: syncOperationId(ownerId, kind, aggregateId),
   ownerId,
   kind,
   aggregateId,

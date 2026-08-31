@@ -18,6 +18,25 @@ export type LocalCompletion = {
   completedAt: string;
 };
 
+export type LocalProgress = {
+  ownerId: string;
+  totalXp: number;
+  currentStreakDays: number;
+  longestStreakDays: number;
+  lastActivityLocalDate: string;
+  updatedAt: string;
+};
+
+export type LocalReviewItem = {
+  ownerId: string;
+  itemId: string;
+  nextReviewAt: string;
+  intervalDays: number;
+  easeFactor: number;
+  repetitions: number;
+  updatedAt: string;
+};
+
 export type LocalSyncOperation = {
   id: string;
   ownerId: string;
@@ -36,6 +55,11 @@ export type LocalPersistence = {
   listAttempts(lessonRunId: string): Promise<LocalAttempt[]>;
   insertCompletionOnce(completion: LocalCompletion): Promise<LocalCompletion>;
   getCompletion(lessonRunId: string): Promise<LocalCompletion | null>;
+  getProgress(ownerId: string): Promise<LocalProgress | null>;
+  upsertProgress(progress: LocalProgress): Promise<void>;
+  upsertReviewItem(item: LocalReviewItem): Promise<void>;
+  getReviewItem(ownerId: string, itemId: string): Promise<LocalReviewItem | null>;
+  listDueReviewItems(ownerId: string, at: string): Promise<LocalReviewItem[]>;
   upsertSyncOperation(operation: LocalSyncOperation): Promise<void>;
   getSyncOperation(id: string): Promise<LocalSyncOperation | null>;
   listSyncOperations(): Promise<LocalSyncOperation[]>;
@@ -45,8 +69,12 @@ export type LocalPersistence = {
 type MemoryState = {
   attempts: Map<string, LocalAttempt>;
   completions: Map<string, LocalCompletion>;
+  progress: Map<string, LocalProgress>;
+  reviewItems: Map<string, LocalReviewItem>;
   operations: Map<string, LocalSyncOperation>;
 };
+
+const reviewItemKey = (ownerId: string, itemId: string) => `${ownerId}:${itemId}`;
 
 const clone = <T>(value: T): T => structuredClone(value);
 
@@ -56,11 +84,15 @@ function memoryStore(state: MemoryState): LocalPersistence {
       const draft: MemoryState = {
         attempts: clone(state.attempts),
         completions: clone(state.completions),
+        progress: clone(state.progress),
+        reviewItems: clone(state.reviewItems),
         operations: clone(state.operations),
       };
       const result = await work(memoryStore(draft));
       state.attempts = draft.attempts;
       state.completions = draft.completions;
+      state.progress = draft.progress;
+      state.reviewItems = draft.reviewItems;
       state.operations = draft.operations;
       return result;
     },
@@ -87,6 +119,26 @@ function memoryStore(state: MemoryState): LocalPersistence {
       );
       return result ? clone(result) : null;
     },
+    async getProgress(ownerId) {
+      const result = state.progress.get(ownerId);
+      return result ? clone(result) : null;
+    },
+    async upsertProgress(progress) {
+      state.progress.set(progress.ownerId, clone(progress));
+    },
+    async upsertReviewItem(item) {
+      state.reviewItems.set(reviewItemKey(item.ownerId, item.itemId), clone(item));
+    },
+    async getReviewItem(ownerId, itemId) {
+      const result = state.reviewItems.get(reviewItemKey(ownerId, itemId));
+      return result ? clone(result) : null;
+    },
+    async listDueReviewItems(ownerId, at) {
+      return [...state.reviewItems.values()]
+        .filter((item) => item.ownerId === ownerId && item.nextReviewAt <= at)
+        .sort((left, right) => left.nextReviewAt.localeCompare(right.nextReviewAt))
+        .map(clone);
+    },
     async upsertSyncOperation(operation) {
       const existing = [...state.operations.values()].find(
         (candidate) =>
@@ -110,7 +162,13 @@ function memoryStore(state: MemoryState): LocalPersistence {
 }
 
 export function createMemoryPersistence(): LocalPersistence {
-  return memoryStore({ attempts: new Map(), completions: new Map(), operations: new Map() });
+  return memoryStore({
+    attempts: new Map(),
+    completions: new Map(),
+    progress: new Map(),
+    reviewItems: new Map(),
+    operations: new Map(),
+  });
 }
 
 export async function openBuaDatabase(): Promise<LocalPersistence> {
@@ -196,6 +254,115 @@ export async function openBuaDatabase(): Promise<LocalPersistence> {
             completedAt: row.completed_at,
           }
         : null;
+    },
+    async getProgress(ownerId) {
+      const row = await database.getFirstAsync<{
+        owner_id: string;
+        total_xp: number;
+        current_streak_days: number;
+        longest_streak_days: number;
+        last_activity_local_date: string;
+        updated_at: string;
+      }>('select * from local_progress where owner_id = ?', ownerId);
+      return row
+        ? {
+            ownerId: row.owner_id,
+            totalXp: row.total_xp,
+            currentStreakDays: row.current_streak_days,
+            longestStreakDays: row.longest_streak_days,
+            lastActivityLocalDate: row.last_activity_local_date,
+            updatedAt: row.updated_at,
+          }
+        : null;
+    },
+    async upsertProgress(progress) {
+      await database.runAsync(
+        `insert into local_progress
+          (owner_id, total_xp, current_streak_days, longest_streak_days, last_activity_local_date, updated_at)
+         values (?, ?, ?, ?, ?, ?)
+         on conflict (owner_id) do update set
+           total_xp = excluded.total_xp,
+           current_streak_days = excluded.current_streak_days,
+           longest_streak_days = excluded.longest_streak_days,
+           last_activity_local_date = excluded.last_activity_local_date,
+           updated_at = excluded.updated_at`,
+        progress.ownerId,
+        progress.totalXp,
+        progress.currentStreakDays,
+        progress.longestStreakDays,
+        progress.lastActivityLocalDate,
+        progress.updatedAt,
+      );
+    },
+    async upsertReviewItem(item) {
+      await database.runAsync(
+        `insert into local_review_schedule
+          (owner_id, item_id, next_review_at, interval_days, ease_factor, repetitions, updated_at)
+         values (?, ?, ?, ?, ?, ?, ?)
+         on conflict (owner_id, item_id) do update set
+           next_review_at = excluded.next_review_at,
+           interval_days = excluded.interval_days,
+           ease_factor = excluded.ease_factor,
+           repetitions = excluded.repetitions,
+           updated_at = excluded.updated_at`,
+        item.ownerId,
+        item.itemId,
+        item.nextReviewAt,
+        item.intervalDays,
+        item.easeFactor,
+        item.repetitions,
+        item.updatedAt,
+      );
+    },
+    async getReviewItem(ownerId, itemId) {
+      const row = await database.getFirstAsync<{
+        owner_id: string;
+        item_id: string;
+        next_review_at: string;
+        interval_days: number;
+        ease_factor: number;
+        repetitions: number;
+        updated_at: string;
+      }>(
+        'select * from local_review_schedule where owner_id = ? and item_id = ?',
+        ownerId,
+        itemId,
+      );
+      return row
+        ? {
+            ownerId: row.owner_id,
+            itemId: row.item_id,
+            nextReviewAt: row.next_review_at,
+            intervalDays: row.interval_days,
+            easeFactor: row.ease_factor,
+            repetitions: row.repetitions,
+            updatedAt: row.updated_at,
+          }
+        : null;
+    },
+    async listDueReviewItems(ownerId, at) {
+      const rows = await database.getAllAsync<{
+        owner_id: string;
+        item_id: string;
+        next_review_at: string;
+        interval_days: number;
+        ease_factor: number;
+        repetitions: number;
+        updated_at: string;
+      }>(
+        'select * from local_review_schedule where owner_id = ? and next_review_at <= ? order by next_review_at',
+        ownerId,
+        at,
+      );
+      return rows.map((row) => ({
+        ownerId: row.owner_id,
+        itemId: row.item_id,
+        nextReviewAt: row.next_review_at,
+        intervalDays: row.interval_days,
+        easeFactor: row.ease_factor,
+        repetitions: row.repetitions,
+        updatedAt: row.updated_at,
+      }));
     },
     async upsertSyncOperation(operation) {
       await database.runAsync(

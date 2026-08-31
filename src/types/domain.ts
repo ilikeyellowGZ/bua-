@@ -93,6 +93,27 @@ export type StreakState = {
   lastCompletedLocalDate: string;
 };
 
+export type Progress = {
+  ownerId: string;
+  totalXP: number;
+  streak: StreakState;
+};
+
+export type ProgressUpdate = {
+  progress: Progress;
+  xpAwarded: number;
+  streakExtended: boolean;
+};
+
+export type SpacedRepetitionItem = {
+  itemId: string;
+  ownerId: string;
+  nextReviewAt: string;
+  intervalDays: number;
+  easeFactor: number;
+  repetitions: number;
+};
+
 export type LessonCompletion = {
   id: string;
   lessonRunId: string;

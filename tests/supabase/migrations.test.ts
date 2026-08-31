@@ -9,6 +9,7 @@ describe('Supabase migration security contract', () => {
   const rls = readMigration('202608210002_bua_rls.sql');
   const functions = readMigration('202608210003_bua_functions.sql');
   const liveIdentity = readMigration('202608220001_live_identity.sql');
+  const progress = readMigration('202608220002_bua_progress.sql');
 
   it('uses timezone-aware timestamps, constraints, and indexed ownership keys', () => {
     expect(core).not.toMatch(/\btimestamp\b(?!tz)/);
@@ -65,5 +66,18 @@ describe('Supabase migration security contract', () => {
     expect(liveIdentity).toContain('on conflict (id) do nothing');
     expect(liveIdentity).toContain('create trigger on_auth_user_created');
     expect(liveIdentity).toContain('after insert on auth.users');
+  });
+
+  it('enforces RLS and idempotent replay for the progress-tracking tables', () => {
+    for (const table of ['progress_events', 'review_schedule']) {
+      expect(progress).toContain(`alter table public.${table} enable row level security`);
+      expect(progress).toContain(`alter table public.${table} force row level security`);
+    }
+    expect(progress).toContain('(select auth.uid()) = owner_id');
+    expect(progress).toContain('security definer');
+    expect(progress).toContain("set search_path = ''");
+    expect(progress).toContain('on conflict (id) do nothing');
+    expect(progress).toContain('get diagnostics inserted = row_count');
+    expect(progress).toContain('revoke all on function public.apply_progress_update');
   });
 });

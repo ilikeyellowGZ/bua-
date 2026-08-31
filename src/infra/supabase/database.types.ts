@@ -13,6 +13,9 @@ export type Database = {
           goal: 'colleagues' | 'family' | 'campus' | 'everyday' | null;
           daily_goal_minutes: number;
           streak_days: number;
+          total_xp: number;
+          longest_streak_days: number;
+          last_activity_local_date: string | null;
           onboarding_completed: boolean;
           created_at: Timestamp;
           updated_at: Timestamp;
@@ -24,6 +27,9 @@ export type Database = {
           goal?: 'colleagues' | 'family' | 'campus' | 'everyday' | null;
           daily_goal_minutes?: number;
           streak_days?: number;
+          total_xp?: number;
+          longest_streak_days?: number;
+          last_activity_local_date?: string | null;
           onboarding_completed?: boolean;
           created_at?: Timestamp;
           updated_at?: Timestamp;
@@ -215,6 +221,42 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      progress_events: {
+        Row: {
+          id: string;
+          owner_id: string;
+          xp_awarded: number;
+          current_streak_days: number;
+          longest_streak_days: number;
+          last_activity_local_date: string;
+          created_at: Timestamp;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      review_schedule: {
+        Row: {
+          owner_id: string;
+          item_id: string;
+          next_review_at: Timestamp;
+          interval_days: number;
+          ease_factor: number;
+          repetitions: number;
+          updated_at: Timestamp;
+        };
+        Insert: {
+          owner_id: string;
+          item_id: string;
+          next_review_at: Timestamp;
+          interval_days: number;
+          ease_factor: number;
+          repetitions?: number;
+          updated_at?: Timestamp;
+        };
+        Update: Partial<Database['public']['Tables']['review_schedule']['Insert']>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -229,6 +271,16 @@ export type Database = {
         Returns: Database['public']['Tables']['lesson_completions']['Row'];
       };
       ack_sync_operation: { Args: { p_operation_id: string }; Returns: boolean };
+      apply_progress_update: {
+        Args: {
+          p_event_id: string;
+          p_xp_awarded: number;
+          p_current_streak_days: number;
+          p_longest_streak_days: number;
+          p_last_activity_local_date: string;
+        };
+        Returns: Database['public']['Tables']['profiles']['Row'];
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
