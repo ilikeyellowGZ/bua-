@@ -1,8 +1,18 @@
 import { useCallback, useRef, useState } from 'react';
 
-import { createDemoSpeechRecognitionAdapter } from '@/features/lesson-runner/speech-recognition';
+import { createNativeSpeechRecognitionAdapter } from '@/features/lesson-runner/native-speech-recognition';
+import {
+  createDemoSpeechRecognitionAdapter,
+  type SpeechRecognitionAdapter,
+} from '@/features/lesson-runner/speech-recognition';
 import { createPronunciationScoringAdapter } from '@/features/lesson-runner/pronunciation-scoring';
 import type { PronunciationResult } from '@/types/domain';
+
+function createRecognizer(demoTranscript: string): SpeechRecognitionAdapter {
+  return process.env.EXPO_PUBLIC_DEMO_MODE === 'false'
+    ? createNativeSpeechRecognitionAdapter()
+    : createDemoSpeechRecognitionAdapter({ transcript: demoTranscript });
+}
 
 export type VoicePracticeStatus = 'idle' | 'listening' | 'processing' | 'result' | 'denied';
 
@@ -30,7 +40,7 @@ export function useVoicePractice({
     const attemptId = (attemptRef.current += 1);
     const isStaleAttempt = () => attemptRef.current !== attemptId;
 
-    const recognizer = createDemoSpeechRecognitionAdapter({ transcript: demoTranscript });
+    const recognizer = createRecognizer(demoTranscript);
     setStatus('listening');
     const permission = await recognizer.requestPermission();
     if (isStaleAttempt()) return;

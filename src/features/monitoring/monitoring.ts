@@ -1,4 +1,7 @@
+import * as Sentry from '@sentry/react-native';
+
 import { getSupabaseClient } from '@/infra/supabase/client';
+import { suggestFix } from '@/features/monitoring/suggest-fix';
 
 export type MonitoringContext = Record<string, unknown>;
 
@@ -20,6 +23,7 @@ export function createConsoleMonitoringService(): MonitoringService {
       console.error('[bua:monitoring] error', normalized.message, {
         ...context,
         stack: normalized.stack,
+        suggestedFix: suggestFix(error),
       });
     },
     captureMessage(message, context = {}) {
@@ -73,7 +77,7 @@ export function createSupabaseMonitoringService({
     captureError(error, context = {}) {
       fallback.captureError(error, context);
       const normalized = error instanceof Error ? error : new Error(String(error));
-      persist('error', normalized.message, context);
+      persist('error', normalized.message, { ...context, suggestedFix: suggestFix(error) });
     },
     captureMessage(message, context = {}) {
       fallback.captureMessage(message, context);
@@ -86,7 +90,59 @@ export function createSupabaseMonitoringService({
   };
 }
 
-export const monitoringService: MonitoringService =
-  process.env.EXPO_PUBLIC_DEMO_MODE === 'false'
+export type SentryClient = Pick<typeof Sentry, 'init' | 'captureException' | 'captureMessage' | 'setUser'>;
+
+type SentryMonitoringOptions = {
+  dsn: string;
+  sentry?: SentryClient;
+  fallback?: MonitoringService;
+  environment?: string;
+};
+
+let sentryInitialized = false;
+
+/**
+ * Wraps whichever base service is passed in and additionally reports to
+ * Sentry. JS-only: this does not add the Expo config plugin (native crash
+ * symbolication, source maps), since that needs your actual Sentry org/project
+ * slugs — see .env.example for the one step required to activate this.
+ */
+export function createSentryMonitoringService({
+  dsn,
+  sentry = Sentry,
+  fallback = createConsoleMonitoringService(),
+  environment = process.env.EXPO_PUBLIC_APP_ENV,
+}: SentryMonitoringOptions): MonitoringService {
+  if (!sentryInitialized) {
+    sentry.init({ dsn, environment, tracesSampleRate: 0 });
+    sentryInitialized = true;
+  }
+
+  return {
+    captureError(error, context = {}) {
+      fallback.captureError(error, context);
+      const normalized = error instanceof Error ? error : new Error(String(error));
+      sentry.captureException(normalized, { extra: { ...context, suggestedFix: suggestFix(error) } });
+    },
+    captureMessage(message, context = {}) {
+      fallback.captureMessage(message, context);
+      sentry.captureMessage(message, { extra: context });
+    },
+    setUser(userId) {
+      fallback.setUser(userId);
+      sentry.setUser(userId ? { id: userId } : null);
+    },
+  };
+}
+
+function createBaseMonitoringService(): MonitoringService {
+  return process.env.EXPO_PUBLIC_DEMO_MODE === 'false'
     ? createSupabaseMonitoringService()
     : createConsoleMonitoringService();
+}
+
+const sentryDsn = process.env.EXPO_PUBLIC_SENTRY_DSN;
+
+export const monitoringService: MonitoringService = sentryDsn
+  ? createSentryMonitoringService({ dsn: sentryDsn, fallback: createBaseMonitoringService() })
+  : createBaseMonitoringService();

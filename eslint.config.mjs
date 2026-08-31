@@ -11,6 +11,7 @@ export default defineConfig([
       'design/reference/**',
       'dist/**',
       'node_modules/**',
+      'supabase/functions/**',
     ],
   },
 ]);

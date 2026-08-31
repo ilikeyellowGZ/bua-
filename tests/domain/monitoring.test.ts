@@ -15,6 +15,20 @@ describe('createConsoleMonitoringService', () => {
     spy.mockRestore();
   });
 
+  it('includes a suggested fix alongside every captured error', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const monitor = createConsoleMonitoringService();
+
+    monitor.captureError(new Error('Row-level security policy violation'));
+
+    expect(spy).toHaveBeenCalledWith(
+      '[bua:monitoring] error',
+      expect.any(String),
+      expect.objectContaining({ suggestedFix: expect.stringContaining('Row-Level Security') }),
+    );
+    spy.mockRestore();
+  });
+
   it('normalizes a non-Error thrown value into a message', () => {
     const spy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
     const monitor = createConsoleMonitoringService();

@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 
+import { finishOnboarding } from '@/features/onboarding/finish-onboarding';
 import { GoalScreen } from '@/features/onboarding/goal-screen';
-import { updateOnboardingDraft } from '@/features/onboarding/update-draft';
 
 export default function GoalRoute() {
   const router = useRouter();
@@ -9,7 +9,7 @@ export default function GoalRoute() {
     <GoalScreen
       onBack={() => router.back()}
       onContinue={async (goal) => {
-        await updateOnboardingDraft({ goal });
+        await finishOnboarding(goal);
         router.replace('/learn');
       }}
     />

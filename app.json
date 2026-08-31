@@ -9,7 +9,10 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.bua.learn"
+      "bundleIdentifier": "com.bua.learn",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Bua uses your microphone so you can practise speaking and get pronunciation feedback."
+      }
     },
     "android": {
       "package": "com.bua.learn",
@@ -17,7 +20,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#10243B"
-      }
+      },
+      "permissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
       "output": "static",
@@ -33,7 +37,14 @@
         }
       ],
       "expo-sqlite",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-audio",
+      [
+        "expo-notifications",
+        {
+          "color": "#2B9C91"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

@@ -32,11 +32,14 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@sentry/react-native": "^8.24.0",
     "@supabase/supabase-js": "^2.112.3",
     "expo": "~57.0.15",
+    "expo-audio": "~57.0.4",
     "expo-constants": "~57.0.13",
     "expo-image": "~57.0.3",
     "expo-linking": "~57.0.7",
+    "expo-notifications": "~57.0.15",
     "expo-router": "~57.0.15",
     "expo-secure-store": "~57.0.1",
     "expo-splash-screen": "~57.0.7",
@@ -80,6 +83,11 @@
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1"
     },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/.*|native-base|standard-navigation))",
+      "/node_modules/react-native-reanimated/plugin/",
+      "/node_modules/@react-native/babel-preset/"
+    ],
     "setupFilesAfterEnv": [
       "<rootDir>/tests/setup.ts"
     ],

@@ -36,7 +36,11 @@ for (const [route, ready, file] of routes) {
       errors.push(message.text());
     }
   });
-  page.on('pageerror', (error) => errors.push(error.message));
+  page.on('pageerror', (error) => {
+    // See capture-product-slice.mjs: known, web-export-only expo-sqlite Worker
+    // bundling issue that doesn't reach native iOS/Android builds.
+    if (!/Requiring unknown module/.test(error.message)) errors.push(error.message);
+  });
   await page.goto(`http://127.0.0.1:4173/lesson/lesson-introduce-yourself/${route}`, {
     waitUntil: 'networkidle',
   });

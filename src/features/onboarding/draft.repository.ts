@@ -12,6 +12,7 @@ const draftSchema = z.object({
   reminderLocalTime: z.string(),
   startingLevelChoice: z.enum(['new', 'a-little', 'conversation']).nullable(),
   goal: z.enum(['colleagues', 'family', 'campus', 'everyday']).nullable(),
+  completed: z.boolean(),
 });
 
 export type OnboardingDraft = {
@@ -23,6 +24,7 @@ export type OnboardingDraft = {
   reminderLocalTime: string;
   startingLevelChoice: StartingLevelChoice | null;
   goal: GoalKind | null;
+  completed: boolean;
 };
 
 export const initialOnboardingDraft: OnboardingDraft = {
@@ -34,6 +36,7 @@ export const initialOnboardingDraft: OnboardingDraft = {
   reminderLocalTime: '19:30',
   startingLevelChoice: null,
   goal: null,
+  completed: false,
 };
 
 type KeyValueStorage = {

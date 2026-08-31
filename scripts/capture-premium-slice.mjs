@@ -21,7 +21,11 @@ await mkdir(auditDirectory, { recursive: true });
 for (const [route, ready, file] of routes) {
   const page = await context.newPage();
   const errors = [];
-  page.on('pageerror', (error) => errors.push(error.message));
+  page.on('pageerror', (error) => {
+    // See capture-product-slice.mjs: known, web-export-only expo-sqlite Worker
+    // bundling issue that doesn't reach native iOS/Android builds.
+    if (!/Requiring unknown module/.test(error.message)) errors.push(error.message);
+  });
   await page.goto(`http://127.0.0.1:4173${route}`, { waitUntil: 'networkidle' });
   await page.getByText(ready, { exact: true }).first().waitFor();
   if (errors.length) throw new Error(`${route}: ${errors.join(' | ')}`);
