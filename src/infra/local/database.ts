@@ -73,6 +73,7 @@ export type LocalPersistence = {
   listAttempts(lessonRunId: string): Promise<LocalAttempt[]>;
   insertCompletionOnce(completion: LocalCompletion): Promise<LocalCompletion>;
   getCompletion(lessonRunId: string): Promise<LocalCompletion | null>;
+  listCompletedLessonIds(ownerId: string): Promise<string[]>;
   getProgress(ownerId: string): Promise<LocalProgress | null>;
   upsertProgress(progress: LocalProgress): Promise<void>;
   upsertReviewItem(item: LocalReviewItem): Promise<void>;
@@ -136,6 +137,15 @@ function memoryStore(state: MemoryState): LocalPersistence {
         (completion) => completion.lessonRunId === lessonRunId,
       );
       return result ? clone(result) : null;
+    },
+    async listCompletedLessonIds(ownerId) {
+      return [
+        ...new Set(
+          [...state.completions.values()]
+            .filter((completion) => completion.ownerId === ownerId)
+            .map((completion) => completion.lessonId),
+        ),
+      ];
     },
     async getProgress(ownerId) {
       const result = state.progress.get(ownerId);
@@ -272,6 +282,13 @@ export async function openBuaDatabase(): Promise<LocalPersistence> {
             completedAt: row.completed_at,
           }
         : null;
+    },
+    async listCompletedLessonIds(ownerId) {
+      const rows = await database.getAllAsync<{ lesson_id: string }>(
+        'select distinct lesson_id from local_completions where owner_id = ?',
+        ownerId,
+      );
+      return rows.map((row) => row.lesson_id);
     },
     async getProgress(ownerId) {
       const row = await database.getFirstAsync<{

@@ -1,11 +1,19 @@
 import { buaSeedContent } from '@/content/seed';
+import { generateLessonsForTopic } from '@/content/lesson-generator';
 import { lessonSchema, unitSchema } from '@/content/schemas';
+import { topics } from '@/content/vocabulary-bank';
 import type { Lesson, Unit } from '@/types/domain';
 
 const candidateUnits = [
   { id: 'unit-greetings', courseId: 'course-isi-zulu', title: 'Greetings', order: 1 },
   { id: 'unit-meeting-people', courseId: 'course-isi-zulu', title: 'Meeting people', order: 2 },
   { id: 'unit-getting-around', courseId: 'course-isi-zulu', title: 'Getting around', order: 3 },
+  ...topics.map((topic, index) => ({
+    id: `unit-${topic.id}`,
+    courseId: 'course-isi-zulu',
+    title: topic.title,
+    order: index + 4,
+  })),
 ] as const;
 
 const meetingPeopleLesson = {
@@ -38,12 +46,12 @@ const meetingPeopleLesson = {
       kind: 'picture-match',
       order: 3,
       required: true,
-      prompt: 'Choose the picture for family.',
+      prompt: 'Tap the picture for:',
       answer: 'umndeni',
       choices: [
-        { id: 'picture-family', label: 'A family gathered together', correct: true },
-        { id: 'picture-water-cup', label: 'A glass of water', correct: false },
-        { id: 'picture-house-plain', label: 'A house', correct: false },
+        { id: 'picture-family', label: 'Family', correct: true, imageKey: 'family' },
+        { id: 'picture-water-cup', label: 'Water', correct: false, imageKey: 'water' },
+        { id: 'picture-house-plain', label: 'House', correct: false, imageKey: 'house' },
       ],
     },
     {
@@ -53,6 +61,11 @@ const meetingPeopleLesson = {
       required: true,
       prompt: 'Ngubani igama lakho?',
       translation: "What's your name?",
+      choices: [
+        { id: 'meeting-reply-name', label: 'Igama lami nguSipho.', correct: true },
+        { id: 'meeting-reply-wellbeing', label: 'Ngiyaphila, ngiyabonga.', correct: false },
+        { id: 'meeting-reply-farewell', label: 'Hamba kahle.', correct: false },
+      ],
     },
     {
       id: 'activity-meeting-comprehension',
@@ -126,12 +139,12 @@ const gettingAroundLesson = {
       kind: 'picture-match',
       order: 3,
       required: true,
-      prompt: 'Choose the picture for house.',
+      prompt: 'Tap the picture for:',
       answer: 'indlu',
       choices: [
-        { id: 'picture-house', label: 'A house', correct: true },
-        { id: 'picture-bread-loaf', label: 'A loaf of bread', correct: false },
-        { id: 'picture-family-group', label: 'A family', correct: false },
+        { id: 'picture-house', label: 'House', correct: true, imageKey: 'house' },
+        { id: 'picture-bread-loaf', label: 'Bread', correct: false, imageKey: 'bread' },
+        { id: 'picture-family-group', label: 'Family', correct: false, imageKey: 'family' },
       ],
     },
     {
@@ -141,6 +154,11 @@ const gettingAroundLesson = {
       required: true,
       prompt: 'Iyaphi le bhasi?',
       translation: 'Where does this bus go?',
+      choices: [
+        { id: 'around-reply-destination', label: 'Iya edolobheni.', correct: true },
+        { id: 'around-reply-name', label: 'Igama lami nguSipho.', correct: false },
+        { id: 'around-reply-thanks', label: 'Ngiyabonga kakhulu.', correct: false },
+      ],
     },
     {
       id: 'activity-around-comprehension',
@@ -186,14 +204,32 @@ const gettingAroundLesson = {
 
 export const buaUnits: readonly Unit[] = candidateUnits.map((unit) => unitSchema.parse(unit));
 
+const generatedLessons: readonly Lesson[] = topics.flatMap((topic) =>
+  generateLessonsForTopic(topic, `unit-${topic.id}`),
+);
+
 export const buaLessons: readonly Lesson[] = [
-  buaSeedContent.lesson,
-  meetingPeopleLesson,
-  gettingAroundLesson,
-].map((lesson) => lessonSchema.parse(lesson));
+  ...[buaSeedContent.lesson, meetingPeopleLesson, gettingAroundLesson].map((lesson) =>
+    lessonSchema.parse(lesson),
+  ),
+  ...generatedLessons,
+];
+
+/**
+ * Lessons generated on demand (the personalized review lesson) aren't part
+ * of the static catalog above, but still need to be reachable through the
+ * same `/lesson/[lessonId]/*` routes. The caller registers a freshly
+ * generated lesson here before navigating to it, so `getLessonById` can find
+ * it synchronously just like a catalog lesson.
+ */
+const ephemeralLessons = new Map<string, Lesson>();
+
+export function registerEphemeralLesson(lesson: Lesson): void {
+  ephemeralLessons.set(lesson.id, lesson);
+}
 
 export function getLessonById(lessonId: string): Lesson | undefined {
-  return buaLessons.find((lesson) => lesson.id === lessonId);
+  return buaLessons.find((lesson) => lesson.id === lessonId) ?? ephemeralLessons.get(lessonId);
 }
 
 export function getUnitByLessonId(lessonId: string): Unit | undefined {

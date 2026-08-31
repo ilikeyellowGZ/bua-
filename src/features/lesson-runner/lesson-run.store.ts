@@ -22,10 +22,23 @@ export type LessonRunCompletion = {
   currentStreakDays: number;
 };
 
+const PASSING_PERFORMANCE = 0.6;
+
 export type LessonRunStore = {
   start(ownerId: string, lesson: Lesson): ActiveLessonRun;
   getActive(): ActiveLessonRun | null;
-  recordAttempt(activityId: string): Promise<void>;
+  /**
+   * `performanceScore` (0-1, defaults to 1) is the learner's real evaluated
+   * outcome for the activity, used for the attempt log and for spaced-
+   * repetition scheduling. The lesson machine itself always advances on
+   * "correct" here: every screen that gates its Continue button on
+   * correctness (phrase-builder, picture-match, conversation, comprehension,
+   * dictation) only reaches this call once the learner is right, and the
+   * free-practice screens (listen, pronunciation, speak) intentionally allow
+   * moving on regardless of practice quality — the machine's retry state is
+   * for a hard gate that none of these screens' UX use.
+   */
+  recordAttempt(activityId: string, performanceScore?: number): Promise<void>;
   complete(completedAtIso?: string): Promise<LessonRunCompletion | null>;
 };
 
@@ -66,7 +79,7 @@ export function createLessonRunStore(persistence: LocalPersistence): LessonRunSt
     getActive() {
       return active;
     },
-    async recordAttempt(activityId) {
+    async recordAttempt(activityId, performanceScore = 1) {
       const run = active;
       if (!run) throw new Error('No active lesson run.');
       const machine = actor ?? startActor(run.lesson);
@@ -80,9 +93,10 @@ export function createLessonRunStore(persistence: LocalPersistence): LessonRunSt
         ownerId: run.ownerId,
         lessonRunId: run.lessonRunId,
         activityId,
-        status: 'correct',
+        status: performanceScore >= PASSING_PERFORMANCE ? 'correct' : 'incorrect',
         createdAt: new Date().toISOString(),
       });
+      await progressTracker.scheduleReview(run.ownerId, activityId, performanceScore);
     },
     async complete(completedAtIso = new Date().toISOString()) {
       const run = active;

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
+import { getLessonById } from '@/content/course-catalog';
 import { LessonCompleteScreen } from '@/features/lesson-runner/screens';
 import { getOwnerId } from '@/features/auth/session';
 import { getLessonRunStore } from '@/features/lesson-runner/default-lesson-run-store';
@@ -49,6 +50,8 @@ async function loadCompletionSummary(): Promise<CompletionSummary> {
 
 export default function CompleteRoute() {
   const router = useRouter();
+  const { lessonId } = useLocalSearchParams<{ lessonId: string }>();
+  const lessonTitle = getLessonById(lessonId)?.title ?? 'this lesson';
   const [summary, setSummary] = useState<CompletionSummary | null>(null);
 
   useEffect(() => {
@@ -74,6 +77,7 @@ export default function CompleteRoute() {
       activitiesCompleted={summary.activitiesCompleted}
       currentStreakDays={summary.currentStreakDays}
       xpAwarded={summary.xpAwarded}
+      lessonTitle={lessonTitle}
       onBackHome={() => router.replace('/learn')}
       onKeepLearning={() => router.replace('/learn')}
     />

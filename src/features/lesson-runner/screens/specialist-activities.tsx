@@ -175,6 +175,7 @@ export function LessonCompleteScreen({
   activitiesCompleted,
   currentStreakDays,
   xpAwarded,
+  lessonTitle,
   onBackHome,
   onKeepLearning,
 }: {
@@ -182,6 +183,7 @@ export function LessonCompleteScreen({
   activitiesCompleted: number;
   currentStreakDays: number;
   xpAwarded: number;
+  lessonTitle: string;
   onBackHome: () => void;
   onKeepLearning: () => void;
 }) {
@@ -198,7 +200,7 @@ export function LessonCompleteScreen({
         <Text
           style={[tokens.typography.bodyLarge, styles.centerText, { color: tokens.color.aloe }]}
         >
-          You can now introduce yourself and ask someone’s name.
+          Great work on {lessonTitle}!
         </Text>
         <View style={styles.celebration}>
           <Mascot
@@ -233,7 +235,7 @@ export function LessonCompleteScreen({
         </View>
         <View style={[styles.skill, { borderColor: tokens.color.aloe }]}>
           <Text style={[tokens.typography.bodyLarge, { color: tokens.color.ink }]}>
-            ✓ Skill unlocked: Introductions
+            ✓ Skill unlocked: {lessonTitle}
           </Text>
         </View>
         <BuaButton label="Keep learning" variant="ink" onPress={onKeepLearning} />

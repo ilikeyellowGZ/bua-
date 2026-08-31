@@ -29,6 +29,7 @@ export type Choice = {
   id: string;
   label: string;
   correct: boolean;
+  imageKey?: string | undefined;
 };
 
 export type Activity = {

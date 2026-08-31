@@ -24,6 +24,18 @@ describe('finishOnboarding', () => {
     process.env.EXPO_PUBLIC_DEMO_MODE = originalDemoMode;
   });
 
+  it('never constructs a real Supabase client in demo mode when no client override is given', async () => {
+    process.env.EXPO_PUBLIC_DEMO_MODE = 'true';
+
+    // No `client` passed here — this is the real call shape used by
+    // src/app/(onboarding)/goal.tsx. Regression test for a bug where the
+    // `client = getSupabaseClient()` default parameter evaluated eagerly on
+    // every call (JS evaluates default params at call time, before the
+    // function body's demo-mode guard runs), throwing a ConfigurationError
+    // whenever real Supabase env vars weren't configured, even in demo mode.
+    await expect(finishOnboarding('everyday', { scheduler: fakeScheduler() })).resolves.toBeUndefined();
+  });
+
   it('marks the local draft complete without contacting the server in demo mode', async () => {
     process.env.EXPO_PUBLIC_DEMO_MODE = 'true';
     const update = jest.fn();

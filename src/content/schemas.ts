@@ -17,6 +17,10 @@ export const choiceSchema = z.object({
   id: z.string().min(1),
   label: z.string().min(1),
   correct: z.boolean(),
+  /** Key into the illustrated scene-art map; only a handful of vocabulary
+   * concepts have bespoke art, so most choices omit this and render as a
+   * text card instead. */
+  imageKey: z.string().min(1).optional(),
 });
 
 export const activitySchema = z.object({

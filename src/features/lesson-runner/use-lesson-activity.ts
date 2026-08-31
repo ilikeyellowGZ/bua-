@@ -1,23 +1,34 @@
 import { useEffect } from 'react';
 
-import { buaSeedContent } from '@/content/seed';
+import { getLessonById } from '@/content/course-catalog';
 import { getOwnerId } from '@/features/auth/session';
 import { getLessonRunStore } from '@/features/lesson-runner/default-lesson-run-store';
+import type { Activity, ActivityKind, Lesson } from '@/types/domain';
 
-export function useLessonActivity(activityId: string) {
+export function getActivityByKind(lesson: Lesson, kind: ActivityKind): Activity {
+  const activity = lesson.activities.find((candidate) => candidate.kind === kind);
+  if (!activity) throw new Error(`Lesson "${lesson.id}" has no "${kind}" activity.`);
+  return activity;
+}
+
+export function useLessonActivity(lessonId: string, kind: ActivityKind) {
+  const lesson = getLessonById(lessonId);
+  if (!lesson) throw new Error(`Unknown lesson: ${lessonId}`);
+  const activity = getActivityByKind(lesson, kind);
+
   useEffect(() => {
     (async () => {
       const [ownerId, store] = await Promise.all([getOwnerId(), getLessonRunStore()]);
-      if (!store.getActive()) store.start(ownerId, buaSeedContent.lesson);
+      store.start(ownerId, lesson);
     })();
-  }, []);
+  }, [lesson]);
 
-  const recordAndContinue = async (onContinue: () => void) => {
+  const recordAndContinue = async (performanceScore: number, onContinue: () => void) => {
     const [ownerId, store] = await Promise.all([getOwnerId(), getLessonRunStore()]);
-    if (!store.getActive()) store.start(ownerId, buaSeedContent.lesson);
-    await store.recordAttempt(activityId);
+    store.start(ownerId, lesson);
+    await store.recordAttempt(activity.id, performanceScore);
     onContinue();
   };
 
-  return { recordAndContinue };
+  return { lesson, activity, recordAndContinue };
 }

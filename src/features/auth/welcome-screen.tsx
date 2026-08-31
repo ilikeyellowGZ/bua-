@@ -12,6 +12,14 @@ export type WelcomeScreenProps = {
   loading?: boolean;
 };
 
+// Approximate height of everything around the mascot at rest (wordmark +
+// subtitle + the three actions with their gaps), so the mascot can be sized
+// from whatever vertical space is actually left over on a given device
+// instead of a fixed guess that overflows short viewports.
+const CHROME_HEIGHT = 98 + 28 + 180;
+const MASCOT_MIN_SIZE = 120;
+const MASCOT_MAX_SIZE = 360;
+
 export function WelcomeScreen({
   onGetStarted,
   onLogin,
@@ -20,7 +28,12 @@ export function WelcomeScreen({
 }: WelcomeScreenProps) {
   const tokens = useTheme();
   const { height, width } = useWindowDimensions();
-  const mascotSize = Math.max(240, Math.min(width * 0.8, height * 0.42, 360));
+  const isCompact = height < 700;
+  const verticalPadding = isCompact ? tokens.space[3] : tokens.space[5];
+  const mascotSize = Math.max(
+    MASCOT_MIN_SIZE,
+    Math.min(width * 0.8, height - verticalPadding * 2 - CHROME_HEIGHT, MASCOT_MAX_SIZE),
+  );
 
   return (
     <ScrollView
@@ -31,7 +44,7 @@ export function WelcomeScreen({
         {
           minHeight: height,
           paddingHorizontal: tokens.space[3],
-          paddingVertical: tokens.space[5],
+          paddingVertical: verticalPadding,
         },
       ]}
     >

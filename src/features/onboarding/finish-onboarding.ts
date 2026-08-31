@@ -21,12 +21,13 @@ type FinishOnboardingOptions = {
  */
 export async function finishOnboarding(
   goal: GoalKind,
-  { client = getSupabaseClient(), scheduler = notificationScheduler }: FinishOnboardingOptions = {},
+  { client, scheduler = notificationScheduler }: FinishOnboardingOptions = {},
 ): Promise<void> {
   const draft = await updateOnboardingDraft({ goal, completed: true });
 
   if (process.env.EXPO_PUBLIC_DEMO_MODE === 'false') {
-    const { error } = await client.from('profiles').update({
+    const supabase = client ?? getSupabaseClient();
+    const { error } = await supabase.from('profiles').update({
       daily_goal_minutes: draft.dailyTargetMinutes,
       goal: draft.goal,
       ...(draft.languageCode ? { language_code: draft.languageCode } : {}),

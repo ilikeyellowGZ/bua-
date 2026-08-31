@@ -97,6 +97,27 @@ describe('ProgressTracker', () => {
     });
   });
 
+  it('lists completed lesson ids for the owner, deduplicated across repeat runs', async () => {
+    const persistence = createMemoryPersistence();
+    const tracker = createProgressTracker(persistence);
+    const completion = (id: string, forOwnerId: string, lessonId: string) => ({
+      id,
+      ownerId: forOwnerId,
+      lessonRunId: id,
+      lessonId,
+      activeLearningSeconds: 60,
+      completedAt: '2026-08-31T10:00:00.000Z',
+    });
+
+    await persistence.insertCompletionOnce(completion('run-1', ownerId, 'lesson-introduce-yourself'));
+    await persistence.insertCompletionOnce(completion('run-1', ownerId, 'lesson-introduce-yourself'));
+    await persistence.insertCompletionOnce(completion('run-2', ownerId, 'lesson-two'));
+    await persistence.insertCompletionOnce(completion('run-3', 'someone-else', 'lesson-introduce-yourself'));
+
+    const completed = await tracker.getCompletedLessonIds(ownerId);
+    expect(new Set(completed)).toEqual(new Set(['lesson-introduce-yourself', 'lesson-two']));
+  });
+
   it('schedules spaced repetition reviews using the configured interval sequence', async () => {
     const persistence = createMemoryPersistence();
     const tracker = createProgressTracker(persistence);

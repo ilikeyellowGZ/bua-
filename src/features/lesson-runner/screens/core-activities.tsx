@@ -11,8 +11,14 @@ import { FeedbackPanel } from '@/ui/feedback/feedback-panel';
 import { ChoiceCard } from '@/ui/lesson/choice-card';
 import { Mascot } from '@/ui/mascot/mascot';
 import { useTheme } from '@/ui/theme/theme-provider';
+import type { Activity } from '@/types/domain';
 
-type ActivityScreenProps = { onClose: () => void; onContinue: () => void };
+type ActivityScreenProps = { activity: Activity; onClose: () => void; onContinue: () => void };
+type PracticeScreenProps = {
+  activity: Activity;
+  onClose: () => void;
+  onContinue: (performanceScore: number) => void;
+};
 
 const scenes = {
   cafe: require('@/assets/scenes/generated/cafe-story.png'),
@@ -26,59 +32,39 @@ const scenes = {
   click: require('@/assets/scenes/generated/click-instructions.png'),
 };
 
-export function ListenScreen({ onClose, onContinue }: ActivityScreenProps) {
+function sceneSource(imageKey: string | undefined) {
+  return imageKey && imageKey in scenes ? scenes[imageKey as keyof typeof scenes] : undefined;
+}
+
+export function ListenScreen({ activity, onClose, onContinue }: ActivityScreenProps) {
   const tokens = useTheme();
-  const [heard, setHeard] = useState<string>();
+  const [heard, setHeard] = useState(false);
   return (
-    <LessonScaffold
-      current={1}
-      eyebrow="Listen"
-      title="Listen to the conversation"
-      onClose={onClose}
-    >
+    <LessonScaffold current={activity.order} eyebrow="Listen" title="Listen and repeat" onClose={onClose}>
       <View style={lessonStyles.stack}>
         <Image
-          accessibilityLabel="Neo and Lerato greet each other outside Kaya Café"
+          accessibilityLabel="Lesson illustration"
           contentFit="cover"
           source={scenes.cafe}
           style={lessonStyles.scene}
         />
-        {(
-          [
-            [
-              'neo',
-              'Play Neo’s introduction',
-              'Sawubona! Igama lami nguNeo.',
-              'Hello! My name is Neo.',
-            ],
-            [
-              'lerato',
-              'Play Lerato’s introduction',
-              'Sawubona, Neo. Mina nginguLerato.',
-              "Hello, Neo. I'm Lerato.",
-            ],
-          ] satisfies readonly (readonly [string, string, string, string])[]
-        ).map(([id, label, line, translation]) => (
-          <View
-            key={id}
-            style={[
-              styles.lineCard,
-              { borderColor: heard === id ? tokens.color.aloe : tokens.color.border },
-            ]}
-          >
-            <AudioControl compact label={label} onPlayed={() => setHeard(id)} />
-            <View style={styles.flexCopy}>
-              <Text style={[tokens.typography.bodyLarge, { color: tokens.color.ink }]}>{line}</Text>
+        <View style={[styles.lineCard, { borderColor: heard ? tokens.color.aloe : tokens.color.border }]}>
+          <AudioControl compact label="Play audio" onPlayed={() => setHeard(true)} />
+          <View style={styles.flexCopy}>
+            <Text style={[tokens.typography.bodyLarge, { color: tokens.color.ink }]}>
+              {activity.prompt}
+            </Text>
+            {activity.translation ? (
               <Text style={[tokens.typography.bodySmall, { color: tokens.color.textMuted }]}>
-                {translation}
+                {activity.translation}
               </Text>
-            </View>
+            ) : null}
           </View>
-        ))}
+        </View>
         <View style={styles.center}>
           <BuaButton
             label="Slow audio"
-            onPress={() => setHeard('slow')}
+            onPress={() => setHeard(true)}
             variant="outline"
             style={styles.inlineButton}
           />
@@ -90,38 +76,35 @@ export function ListenScreen({ onClose, onContinue }: ActivityScreenProps) {
 }
 
 type BuilderToken = { id: string; text: string };
-const phraseTokens: BuilderToken[] = [
-  { id: 'sawubona', text: 'Sawubona.' },
-  { id: 'igama', text: 'Igama' },
-  { id: 'lami', text: 'lami' },
-  { id: 'neo', text: 'nguNeo.' },
-  { id: 'ngikhona', text: 'ngikhona' },
-  { id: 'wena', text: 'wena' },
-  { id: 'kahle', text: 'kahle' },
-];
 
-export function PhraseBuilderScreen({ onClose, onContinue }: ActivityScreenProps) {
+export function PhraseBuilderScreen({ activity, onClose, onContinue }: ActivityScreenProps) {
   const tokens = useTheme();
+  const targetTokens = (activity.answer ?? '').split(' ').filter(Boolean);
+  const phraseTokens: BuilderToken[] = targetTokens.map((text, index) => ({
+    id: `token-${index}`,
+    text,
+  }));
+  const bankOrder = [...phraseTokens].reverse();
   const [answer, setAnswer] = useState<string[]>([]);
   const [result, setResult] = useState<'correct' | 'incorrect'>();
   const answerTokens = answer
     .map((id) => phraseTokens.find((token) => token.id === id))
     .filter(Boolean) as BuilderToken[];
-  const unused = phraseTokens.filter((token) => !answer.includes(token.id));
-  const correct = answer.join('|') === 'sawubona|igama|lami|neo';
+  const unused = bankOrder.filter((token) => !answer.includes(token.id));
+  const correct = answerTokens.map((token) => token.text).join(' ') === targetTokens.join(' ');
 
   const evaluate = () => setResult(correct ? 'correct' : 'incorrect');
   return (
     <LessonScaffold
-      current={2}
+      current={activity.order}
       title="Build the sentence"
-      subtitle="Hello, my name is Neo."
+      subtitle={activity.prompt}
       mascot={<Mascot decorative pose="phrase-builder-cheer" size={82} />}
       onClose={onClose}
     >
       <View style={lessonStyles.stack}>
         <Image
-          accessibilityLabel="Two classmates introducing themselves"
+          accessibilityLabel="Lesson illustration"
           contentFit="cover"
           source={scenes.phrase}
           style={[lessonStyles.scene, { height: 265 }]}
@@ -184,17 +167,13 @@ export function PhraseBuilderScreen({ onClose, onContinue }: ActivityScreenProps
           </View>
         </View>
         {result === 'correct' ? (
-          <FeedbackPanel
-            tone="success"
-            title="Sentence complete"
-            message="Sawubona. Igama lami nguNeo."
-          />
+          <FeedbackPanel tone="success" title="Sentence complete" message={targetTokens.join(' ')} />
         ) : null}
         {result === 'incorrect' ? (
           <FeedbackPanel
             tone="coaching"
             title="Try that order again"
-            message="Start with Sawubona, then introduce your name."
+            message="Check the word order and try again."
           />
         ) : null}
         <View style={lessonStyles.actionRow}>
@@ -219,78 +198,89 @@ export function PhraseBuilderScreen({ onClose, onContinue }: ActivityScreenProps
   );
 }
 
-const pictureChoices = [
-  { id: 'water', label: 'A glass of water', source: scenes.water },
-  { id: 'bread', label: 'A loaf of bread', source: scenes.bread },
-  { id: 'house', label: 'A house', source: scenes.house },
-  { id: 'family', label: 'A family', source: scenes.family },
-] as const;
-
-export function PictureMatchScreen({ onClose, onContinue }: ActivityScreenProps) {
+export function PictureMatchScreen({ activity, onClose, onContinue }: ActivityScreenProps) {
   const tokens = useTheme();
+  const choices = activity.choices ?? [];
   const [selected, setSelected] = useState<string>();
   const [attemptedWrong, setAttemptedWrong] = useState(false);
-  const correct = selected === 'water';
+  const selectedChoice = choices.find((choice) => choice.id === selected);
+  const correctChoice = choices.find((choice) => choice.correct);
+  const correct = Boolean(selectedChoice?.correct);
   return (
     <LessonScaffold
-      current={3}
+      current={activity.order}
       title="Match the word"
-      subtitle="Tap the picture for:"
+      subtitle={activity.prompt}
       mascot={<Mascot decorative pose="picture-match-point" size={100} />}
       onClose={onClose}
     >
       <View style={lessonStyles.stack}>
         <View style={styles.wordRow}>
-          <Text style={[tokens.typography.display, { color: tokens.color.ink }]}>amanzi</Text>
-          <AudioControl compact label="Play amanzi" />
+          <Text style={[tokens.typography.display, { color: tokens.color.ink }]}>
+            {activity.answer}
+          </Text>
+          <AudioControl compact label={`Play ${activity.answer}`} />
         </View>
         <View accessibilityRole="radiogroup" style={styles.pictureGrid}>
-          {pictureChoices.map((choice) => (
-            <Pressable
-              key={choice.id}
-              accessibilityLabel={choice.label}
-              accessibilityRole="radio"
-              accessibilityState={{ checked: selected === choice.id, disabled: correct }}
-              disabled={correct}
-              onPress={() => {
-                setSelected(choice.id);
-                if (choice.id !== 'water') setAttemptedWrong(true);
-              }}
-              style={[
-                styles.pictureCard,
-                {
-                  borderColor:
-                    selected === choice.id
-                      ? correct
-                        ? tokens.color.aloe
-                        : tokens.color.sunPressed
-                      : tokens.color.border,
-                },
-              ]}
-            >
-              <Image contentFit="cover" source={choice.source} style={StyleSheet.absoluteFill} />
-              {selected === choice.id ? (
-                <View
-                  style={[
-                    styles.pictureCheck,
-                    { backgroundColor: correct ? tokens.color.aloe : tokens.color.sun },
-                  ]}
-                >
-                  <Text style={{ color: tokens.color.surface }}>✓</Text>
-                </View>
-              ) : null}
-            </Pressable>
-          ))}
+          {choices.map((choice) => {
+            const source = sceneSource(choice.imageKey);
+            return (
+              <Pressable
+                key={choice.id}
+                accessibilityLabel={choice.label}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: selected === choice.id, disabled: correct }}
+                disabled={correct}
+                onPress={() => {
+                  setSelected(choice.id);
+                  if (!choice.correct) setAttemptedWrong(true);
+                }}
+                style={[
+                  styles.pictureCard,
+                  {
+                    borderColor:
+                      selected === choice.id
+                        ? choice.correct
+                          ? tokens.color.aloe
+                          : tokens.color.sunPressed
+                        : tokens.color.border,
+                  },
+                ]}
+              >
+                {source ? (
+                  <Image contentFit="cover" source={source} style={StyleSheet.absoluteFill} />
+                ) : (
+                  <View
+                    style={[styles.pictureTextCard, { backgroundColor: tokens.color.selectionSurface }]}
+                  >
+                    <Text style={[tokens.typography.h3, { color: tokens.color.ink }]}>
+                      {choice.label}
+                    </Text>
+                  </View>
+                )}
+                {selected === choice.id ? (
+                  <View
+                    style={[
+                      styles.pictureCheck,
+                      { backgroundColor: choice.correct ? tokens.color.aloe : tokens.color.sun },
+                    ]}
+                  >
+                    <Text style={{ color: tokens.color.surface }}>✓</Text>
+                  </View>
+                ) : null}
+              </Pressable>
+            );
+          })}
         </View>
-        {correct ? (
-          <FeedbackPanel tone="success" title="Kulungile!" message="amanzi = water" />
+        {correct && correctChoice ? (
+          <FeedbackPanel
+            tone="success"
+            title="Kulungile!"
+            message={`${activity.answer} = ${correctChoice.label.toLowerCase()}`}
+          />
         ) : null}
         {attemptedWrong && !correct ? (
-          <FeedbackPanel
-            tone="coaching"
-            title="Try another picture"
-            message="Amanzi is something you drink."
-          />
+          <FeedbackPanel tone="coaching" title="Try another picture" message="Listen again and try another option." />
         ) : null}
         <BuaButton label="Continue" disabled={!correct} onPress={onContinue} />
       </View>
@@ -298,15 +288,16 @@ export function PictureMatchScreen({ onClose, onContinue }: ActivityScreenProps)
   );
 }
 
-export function ConversationScreen({ onClose, onContinue }: ActivityScreenProps) {
+export function ConversationScreen({ activity, onClose, onContinue }: ActivityScreenProps) {
   const tokens = useTheme();
-  const choices = ['Kahle, ngiyabonga. Wena?', 'Igama lami nguNeo.', 'Hamba kahle.'];
-  const [selected, setSelected] = useState<string>();
+  const choices = activity.choices ?? [];
+  const [selectedId, setSelectedId] = useState<string>();
   const [showTranslation, setShowTranslation] = useState(false);
   const [result, setResult] = useState<'correct' | 'incorrect'>();
+  const selectedChoice = choices.find((choice) => choice.id === selectedId);
   return (
     <LessonScaffold
-      current={4}
+      current={activity.order}
       dark
       title="Choose your reply"
       mascot={<Mascot decorative pose="conversation-passenger" size={92} />}
@@ -314,7 +305,7 @@ export function ConversationScreen({ onClose, onContinue }: ActivityScreenProps)
     >
       <View style={lessonStyles.stack}>
         <Image
-          accessibilityLabel="A woman greeting you at a South African taxi rank"
+          accessibilityLabel="Lesson illustration"
           contentFit="cover"
           source={scenes.taxi}
           style={[lessonStyles.scene, { height: 245 }]}
@@ -323,11 +314,11 @@ export function ConversationScreen({ onClose, onContinue }: ActivityScreenProps)
           <AudioControl compact dark label="Replay conversation prompt" />
           <View style={styles.flexCopy}>
             <Text style={[tokens.typography.bodyLarge, { color: tokens.color.surface }]}>
-              Sawubona! Unjani namhlanje?
+              {activity.prompt}
             </Text>
-            {showTranslation ? (
+            {showTranslation && activity.translation ? (
               <Text style={[tokens.typography.bodySmall, { color: '#B9C5D0' }]}>
-                Hello! How are you today?
+                {activity.translation}
               </Text>
             ) : null}
           </View>
@@ -335,11 +326,11 @@ export function ConversationScreen({ onClose, onContinue }: ActivityScreenProps)
         <View style={lessonStyles.choices}>
           {choices.map((choice) => (
             <ChoiceCard
-              key={choice}
-              label={choice}
-              selected={selected === choice}
+              key={choice.id}
+              label={choice.label}
+              selected={selectedId === choice.id}
               onPress={() => {
-                setSelected(choice);
+                setSelectedId(choice.id);
                 setResult(undefined);
               }}
             />
@@ -354,22 +345,22 @@ export function ConversationScreen({ onClose, onContinue }: ActivityScreenProps)
           <FeedbackPanel
             tone="coaching"
             title="Choose the social reply"
-            message="Answer how you are, then ask the speaker too."
+            message="Choose the reply that best fits the greeting."
           />
         ) : null}
         <BuaButton
           label={result === 'correct' ? 'Continue' : 'Say this reply'}
-          disabled={!selected}
+          disabled={!selectedId}
           onPress={() => {
             if (result === 'correct') onContinue();
-            else setResult(selected === choices[0] ? 'correct' : 'incorrect');
+            else setResult(selectedChoice?.correct ? 'correct' : 'incorrect');
           }}
         />
         <BuaButton
           label="Choose another"
           variant="outline"
           onPress={() => {
-            setSelected(undefined);
+            setSelectedId(undefined);
             setResult(undefined);
           }}
         />
@@ -378,61 +369,58 @@ export function ConversationScreen({ onClose, onContinue }: ActivityScreenProps)
   );
 }
 
-export function ComprehensionScreen({ onClose, onContinue }: ActivityScreenProps) {
-  const choices = ['I’m Lerato.', 'I’m leaving.', 'I’m studying.'];
-  const [selected, setSelected] = useState<string>();
+export function ComprehensionScreen({ activity, onClose, onContinue }: ActivityScreenProps) {
+  const choices = activity.choices ?? [];
+  const [selectedId, setSelectedId] = useState<string>();
   const [result, setResult] = useState<'correct' | 'incorrect'>();
+  const selectedChoice = choices.find((choice) => choice.id === selectedId);
   return (
     <LessonScaffold
-      current={5}
+      current={activity.order}
       eyebrow="Understand"
-      title="What did Lerato say?"
+      title={activity.prompt}
       subtitle="Choose the best meaning."
       onClose={onClose}
     >
       <View style={lessonStyles.stack}>
         <View style={styles.mediaRow}>
           <Image
-            accessibilityLabel="Lerato speaking outside Kaya Café"
+            accessibilityLabel="Lesson illustration"
             contentFit="cover"
             source={scenes.lerato}
             style={[lessonStyles.scene, styles.leratoScene]}
           />
-          <AudioControl label="Replay Lerato’s introduction" />
+          <AudioControl label="Replay audio" />
         </View>
         <View style={lessonStyles.choices}>
           {choices.map((choice) => (
             <ChoiceCard
-              key={choice}
-              label={choice}
-              selected={selected === choice}
+              key={choice.id}
+              label={choice.label}
+              selected={selectedId === choice.id}
               onPress={() => {
-                setSelected(choice);
+                setSelectedId(choice.id);
                 setResult(undefined);
               }}
             />
           ))}
         </View>
         {result === 'correct' ? (
-          <FeedbackPanel
-            tone="success"
-            title="That’s right"
-            message="Mina nginguLerato means “I’m Lerato.”"
-          />
+          <FeedbackPanel tone="success" title="That’s right" message="Well done — that's the correct meaning." />
         ) : null}
         {result === 'incorrect' ? (
           <FeedbackPanel
             tone="coaching"
             title="Listen once more"
-            message="Mina nginguLerato introduces the speaker by name."
+            message="Listen again and choose the best meaning."
           />
         ) : null}
         <BuaButton
           label={result === 'correct' ? 'Continue' : 'Check answer'}
-          disabled={!selected}
+          disabled={!selectedId}
           onPress={() => {
             if (result === 'correct') onContinue();
-            else setResult(selected === choices[0] ? 'correct' : 'incorrect');
+            else setResult(selectedChoice?.correct ? 'correct' : 'incorrect');
           }}
         />
       </View>
@@ -440,9 +428,9 @@ export function ComprehensionScreen({ onClose, onContinue }: ActivityScreenProps
   );
 }
 
-export function DictationScreen({ onClose, onContinue }: ActivityScreenProps) {
+export function DictationScreen({ activity, onClose, onContinue }: ActivityScreenProps) {
   const tokens = useTheme();
-  const target = 'Ngiyaphila, ngiyabonga.';
+  const target = activity.answer ?? '';
   const [value, setValue] = useState('');
   const [result, setResult] = useState<'correct' | 'incorrect'>();
   const reveal = () => {
@@ -453,7 +441,7 @@ export function DictationScreen({ onClose, onContinue }: ActivityScreenProps) {
   };
   return (
     <LessonScaffold
-      current={6}
+      current={activity.order}
       title="What do you hear?"
       mascot={<Mascot decorative pose="dictation-listen" size={105} />}
       onClose={onClose}
@@ -514,7 +502,7 @@ export function DictationScreen({ onClose, onContinue }: ActivityScreenProps) {
           <FeedbackPanel
             tone="coaching"
             title="Nearly there"
-            message="Listen again and check the spelling of ngiyabonga."
+            message="Listen again and check your spelling."
           />
         ) : null}
         <BuaButton
@@ -531,25 +519,22 @@ export function DictationScreen({ onClose, onContinue }: ActivityScreenProps) {
   );
 }
 
-const CLICK_PRONUNCIATION_EXPECTED_TEXT = 'Sawubona. Igama lami nguNeo.';
-
-export function ClickPronunciationScreen({ onClose, onContinue }: ActivityScreenProps) {
+export function ClickPronunciationScreen({ activity, onClose, onContinue }: PracticeScreenProps) {
   const tokens = useTheme();
-  const { status, result, record } = useVoicePractice({
-    expectedText: CLICK_PRONUNCIATION_EXPECTED_TEXT,
-  });
+  const expectedText = activity.answer ?? activity.prompt;
+  const { status, result, record } = useVoicePractice({ expectedText });
   return (
     <LessonScaffold
-      current={7}
+      current={activity.order}
       dark
-      eyebrow="Learn the click"
-      title={'The “q” sound'}
+      eyebrow="Practice"
+      title="Pronunciation practice"
       mascot={<Mascot decorative pose="pronunciation-coach" size={104} />}
       onClose={onClose}
     >
       <View style={lessonStyles.stack}>
         <Image
-          accessibilityLabel="Tongue placement diagram with three click-pronunciation steps"
+          accessibilityLabel="Pronunciation practice illustration"
           contentFit="contain"
           source={scenes.click}
           style={[lessonStyles.scene, { backgroundColor: tokens.color.surface, height: 270 }]}
@@ -604,27 +589,20 @@ export function ClickPronunciationScreen({ onClose, onContinue }: ActivityScreen
         <BuaButton
           label={result ? 'Continue' : 'Check my sound'}
           disabled={!result}
-          onPress={onContinue}
+          onPress={() => onContinue(result?.score ?? 1)}
         />
       </View>
     </LessonScaffold>
   );
 }
 
-const SPEAK_EXPECTED_TEXT = 'Sawubona. Igama lami nguNeo.';
-const SPEAK_SEGMENTS = ['Sawubona', 'Igama lami', 'nguNeo'];
-const SPEAK_DEMO_TRANSCRIPT = 'Sawubona Igama lami Sipho';
-
-export function SpeakScreen({ onClose, onContinue }: ActivityScreenProps) {
+export function SpeakScreen({ activity, onClose, onContinue }: PracticeScreenProps) {
   const tokens = useTheme();
-  const { status, result, record, reset } = useVoicePractice({
-    expectedText: SPEAK_EXPECTED_TEXT,
-    segments: SPEAK_SEGMENTS,
-    demoTranscript: SPEAK_DEMO_TRANSCRIPT,
-  });
+  const expectedText = activity.answer ?? activity.prompt;
+  const { status, result, record, reset } = useVoicePractice({ expectedText });
   return (
     <LessonScaffold
-      current={8}
+      current={activity.order}
       dark
       eyebrow="Speak"
       title="Say the phrase"
@@ -632,9 +610,7 @@ export function SpeakScreen({ onClose, onContinue }: ActivityScreenProps) {
       onClose={onClose}
     >
       <View style={lessonStyles.stack}>
-        <Text style={[styles.speakPhrase, { color: tokens.color.surface }]}>
-          Sawubona.{`\n`}Igama lami nguNeo.
-        </Text>
+        <Text style={[styles.speakPhrase, { color: tokens.color.surface }]}>{expectedText}</Text>
         <View style={[styles.recordingRing, { borderColor: '#53667A' }]}>
           <Waveform dark />
           <Pressable
@@ -703,7 +679,7 @@ export function SpeakScreen({ onClose, onContinue }: ActivityScreenProps) {
           <BuaButton
             label="Continue"
             disabled={!result}
-            onPress={onContinue}
+            onPress={() => onContinue(result?.score ?? 1)}
             style={styles.flexButton}
           />
         </View>
@@ -761,6 +737,13 @@ const styles = StyleSheet.create({
     width: 42,
   },
   pictureGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  pictureTextCard: {
+    alignItems: 'center',
+    height: '100%',
+    justifyContent: 'center',
+    padding: 12,
+    width: '100%',
+  },
   recordingRing: {
     alignItems: 'center',
     alignSelf: 'center',

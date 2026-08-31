@@ -52,12 +52,13 @@ const candidateSeed = {
         kind: 'picture-match',
         order: 3,
         required: true,
-        prompt: 'Choose the greeting.',
-        answer: 'Sawubona',
+        prompt: 'Tap the picture for:',
+        answer: 'amanzi',
         choices: [
-          { id: 'picture-greeting', label: 'Two classmates greeting', correct: true },
-          { id: 'picture-leaving', label: 'A learner leaving', correct: false },
-          { id: 'picture-thanks', label: 'A learner saying thanks', correct: false },
+          { id: 'picture-water', label: 'Water', correct: true, imageKey: 'water' },
+          { id: 'picture-bread', label: 'Bread', correct: false, imageKey: 'bread' },
+          { id: 'picture-house', label: 'House', correct: false, imageKey: 'house' },
+          { id: 'picture-family', label: 'Family', correct: false, imageKey: 'family' },
         ],
       },
       {
@@ -67,6 +68,11 @@ const candidateSeed = {
         required: true,
         prompt: 'Sawubona! Unjani namhlanje?',
         translation: 'Hello! How are you today?',
+        choices: [
+          { id: 'reply-social', label: 'Kahle, ngiyabonga. Wena?', correct: true },
+          { id: 'reply-name', label: 'Igama lami nguNeo.', correct: false },
+          { id: 'reply-farewell', label: 'Hamba kahle.', correct: false },
+        ],
       },
       {
         id: 'activity-introduce-comprehension',
@@ -88,8 +94,8 @@ const candidateSeed = {
         order: 6,
         required: true,
         prompt: 'Listen and type what you hear.',
-        answer: 'Sawubona. Igama lami nguNeo.',
-        audioAssetId: 'audio-neo-introduction',
+        answer: 'Ngiyaphila, ngiyabonga.',
+        audioAssetId: 'audio-neo-wellbeing',
       },
       {
         id: 'activity-introduce-pronunciation',

@@ -37,6 +37,7 @@ function toSpacedRepetitionItem(stored: LocalReviewItem): SpacedRepetitionItem {
 
 export type ProgressTracker = {
   getProgress(ownerId: string): Promise<Progress>;
+  getCompletedLessonIds(ownerId: string): Promise<string[]>;
   recordLessonCompletion(
     ownerId: string,
     lessonRunId: string,
@@ -57,6 +58,9 @@ export function createProgressTracker(persistence: LocalPersistence): ProgressTr
     async getProgress(ownerId) {
       const stored = await persistence.getProgress(ownerId);
       return toProgress(stored ?? emptyProgress(ownerId));
+    },
+    async getCompletedLessonIds(ownerId) {
+      return persistence.listCompletedLessonIds(ownerId);
     },
     async recordLessonCompletion(ownerId, lessonRunId, lesson, completedAtIso) {
       return persistence.transaction(async (store) => {

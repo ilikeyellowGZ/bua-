@@ -1,13 +1,67 @@
 import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { MotionEntrance } from '@/core/motion/motion-entrance';
+import type { PathItem } from '@/features/learning-path/unit-progress';
 import { BuaButton } from '@/ui/controls/bua-button';
 import { Mascot } from '@/ui/mascot/mascot';
 import { useTheme } from '@/ui/theme/theme-provider';
 
-type LearnScreenProps = { onContinueLesson: () => void; onQuickReview: () => void };
+const UNIT_SYMBOLS: Record<string, string> = {
+  'unit-greetings': '👋',
+  'unit-meeting-people': '••',
+  'unit-getting-around': '⌖',
+  'unit-numbers': '#',
+  'unit-family': '♥',
+  'unit-food': '🍞',
+  'unit-routine': '◷',
+  'unit-weather': '☀',
+  'unit-shopping': '🛍',
+  'unit-campus': '🎓',
+  'unit-transport': '🚌',
+  'unit-work': '💼',
+  'unit-health': '⚕',
+};
 
-export function LearnScreen({ onContinueLesson, onQuickReview }: LearnScreenProps) {
+const DEFAULT_PATH: PathItem[] = [
+  {
+    unitId: 'unit-greetings',
+    title: 'Greetings',
+    unitLabel: 'Unit 1',
+    state: 'complete',
+    completedLessons: 1,
+    totalLessons: 1,
+  },
+  {
+    unitId: 'unit-meeting-people',
+    title: 'Meeting people',
+    unitLabel: 'Unit 2',
+    state: 'active',
+    completedLessons: 0,
+    totalLessons: 1,
+  },
+  {
+    unitId: 'unit-getting-around',
+    title: 'Getting around',
+    unitLabel: 'Unit 3',
+    state: 'locked',
+    completedLessons: 0,
+    totalLessons: 1,
+  },
+];
+
+type LearnScreenProps = {
+  onContinueLesson: () => void;
+  onQuickReview: () => void;
+  onSelectUnit?: (unitId: string) => void;
+  path?: PathItem[];
+};
+
+export function LearnScreen({
+  onContinueLesson,
+  onQuickReview,
+  onSelectUnit,
+  path = DEFAULT_PATH,
+}: LearnScreenProps) {
   const tokens = useTheme();
   const { height } = useWindowDimensions();
   return (
@@ -65,67 +119,72 @@ export function LearnScreen({ onContinueLesson, onQuickReview }: LearnScreenProp
       </MotionEntrance>
       <Text style={[tokens.typography.h2, { color: tokens.color.ink }]}>Your path</Text>
       <View style={styles.path}>
-        {[
-          { n: 1, title: 'Greetings', unit: 'Unit 1', state: '✓', active: true },
-          { n: 2, title: 'Meeting people', unit: 'Unit 2', state: '›', active: true },
-          { n: 3, title: 'Getting around', unit: 'Unit 3', state: '🔒', active: false },
-        ].map((item) => (
-          <View key={item.n} style={styles.pathRow}>
-            <View
-              style={[
-                styles.number,
-                { backgroundColor: item.active ? tokens.color.aloe : tokens.color.disabledSurface },
-              ]}
-            >
-              <Text
-                style={[
-                  tokens.typography.bodyLarge,
-                  { color: item.active ? tokens.color.surface : tokens.color.textMuted },
-                ]}
-              >
-                {item.n}
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.pathCard,
-                { backgroundColor: tokens.color.surface, opacity: item.active ? 1 : 0.65 },
-              ]}
-            >
+        {path.map((item, index) => {
+          const active = item.state !== 'locked';
+          const stateSymbol = item.state === 'complete' ? '✓' : item.state === 'active' ? '›' : '🔒';
+          return (
+            <View key={item.unitId} style={styles.pathRow}>
               <View
                 style={[
-                  styles.unitArt,
-                  { backgroundColor: item.n === 2 ? '#FFE3C1' : tokens.color.selectionSurface },
+                  styles.number,
+                  { backgroundColor: active ? tokens.color.aloe : tokens.color.disabledSurface },
                 ]}
               >
-                <Text style={styles.unitSymbol}>
-                  {item.n === 1 ? '👋' : item.n === 2 ? '••' : '⌖'}
+                <Text
+                  style={[
+                    tokens.typography.bodyLarge,
+                    { color: active ? tokens.color.surface : tokens.color.textMuted },
+                  ]}
+                >
+                  {index + 1}
                 </Text>
               </View>
-              <View style={styles.pathCopy}>
-                <Text style={[tokens.typography.h3, { color: tokens.color.ink }]}>
-                  {item.title}
-                </Text>
-                <Text style={[tokens.typography.bodySmall, { color: tokens.color.textMuted }]}>
-                  {item.unit}
-                </Text>
-                {item.n === 2 ? (
-                  <Text style={[tokens.typography.caption, { color: tokens.color.aloe }]}>
-                    ● ● ● ○ ○ ○ ○
-                  </Text>
-                ) : null}
-              </View>
-              <Text
+              <Pressable
+                accessibilityLabel={`${item.title}, ${item.unitLabel}`}
+                accessibilityRole="button"
+                disabled={!active}
+                onPress={() => onSelectUnit?.(item.unitId)}
                 style={[
-                  tokens.typography.h3,
-                  { color: item.active ? tokens.color.aloe : tokens.color.disabledText },
+                  styles.pathCard,
+                  { backgroundColor: tokens.color.surface, opacity: active ? 1 : 0.65 },
                 ]}
               >
-                {item.state}
-              </Text>
+                <View
+                  style={[
+                    styles.unitArt,
+                    {
+                      backgroundColor:
+                        item.state === 'active' ? '#FFE3C1' : tokens.color.selectionSurface,
+                    },
+                  ]}
+                >
+                  <Text style={styles.unitSymbol}>{UNIT_SYMBOLS[item.unitId] ?? '◆'}</Text>
+                </View>
+                <View style={styles.pathCopy}>
+                  <Text style={[tokens.typography.h3, { color: tokens.color.ink }]}>
+                    {item.title}
+                  </Text>
+                  <Text style={[tokens.typography.bodySmall, { color: tokens.color.textMuted }]}>
+                    {item.unitLabel}
+                  </Text>
+                  {item.state === 'active' && item.totalLessons > 0 ? (
+                    <Text style={[tokens.typography.caption, { color: tokens.color.aloe }]}>
+                      {item.completedLessons} of {item.totalLessons} lessons
+                    </Text>
+                  ) : null}
+                </View>
+                <Text
+                  style={[
+                    tokens.typography.h3,
+                    { color: active ? tokens.color.aloe : tokens.color.disabledText },
+                  ]}
+                >
+                  {stateSymbol}
+                </Text>
+              </Pressable>
             </View>
-          </View>
-        ))}
+          );
+        })}
       </View>
       <Pressable
         accessibilityLabel="Quick review, 5 phrases due"
