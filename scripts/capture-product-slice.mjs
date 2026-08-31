@@ -14,17 +14,20 @@ const routes = [
 ];
 
 const browser = await chromium.launch({ channel: 'msedge', headless: true });
-const context = await browser.newContext({
-  deviceScaleFactor: 1,
-  hasTouch: true,
-  isMobile: true,
-  reducedMotion: 'reduce',
-  viewport: { width: 390, height: 844 },
-});
 const auditDirectory = resolve(process.cwd(), 'design', 'audit');
 await mkdir(auditDirectory, { recursive: true });
 
 for (const route of routes) {
+  // See capture-lesson-slice.mjs: a fresh context per route isolates each
+  // page's OPFS storage so expo-sqlite's web backend never races two open
+  // access handles on the same local database file.
+  const context = await browser.newContext({
+    deviceScaleFactor: 1,
+    hasTouch: true,
+    isMobile: true,
+    reducedMotion: 'reduce',
+    viewport: { width: 390, height: 844 },
+  });
   const page = await context.newPage();
   const errors = [];
   page.on('console', (message) => {
@@ -33,18 +36,16 @@ for (const route of routes) {
     }
   });
   page.on('pageerror', (error) => {
-    // Known, scoped issue: expo-sqlite's web Worker bundle mis-resolves a
-    // module id under Metro's web static export. Native iOS/Android builds
-    // never hit this code path (they use native SQLite bindings, not the
-    // wasm/Worker fallback), so it doesn't affect the shipped app — only the
-    // web-export preview these captures render against.
-    if (!/Requiring unknown module/.test(error.message)) errors.push(error.message);
+    errors.push(error.message);
   });
   await page.goto(`http://127.0.0.1:4173${route.path}`, { waitUntil: 'networkidle' });
   await page.getByText(route.ready, { exact: true }).first().waitFor();
+  // See capture-lesson-slice.mjs: expo-image's web crossfade can still be
+  // mid-animation right when the ready text appears.
+  await page.waitForTimeout(600);
   if (errors.length > 0) throw new Error(`${route.path}: ${errors.join(' | ')}`);
   await page.screenshot({ path: resolve(auditDirectory, route.file), fullPage: true });
-  await page.close();
+  await context.close();
 }
 
 console.log(`PRODUCT_SLICE_SCREENSHOTS=${routes.length}`);

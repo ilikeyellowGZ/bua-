@@ -18,17 +18,23 @@ const routes = [
 ];
 
 const browser = await chromium.launch({ channel: 'msedge', headless: true });
-const context = await browser.newContext({
-  deviceScaleFactor: 1,
-  hasTouch: true,
-  isMobile: true,
-  reducedMotion: 'reduce',
-  viewport: { width: 390, height: 844 },
-});
 const auditDirectory = resolve(process.cwd(), 'design', 'audit', 'lesson');
 await mkdir(auditDirectory, { recursive: true });
 
 for (const [route, ready, file] of routes) {
+  // A fresh context per route (rather than one context shared across the
+  // loop) gives each page its own storage partition. expo-sqlite's web
+  // backend opens the local database through an OPFS sync access handle,
+  // which only one open page may hold at a time — sharing a context across
+  // sequential page loads on the same origin raced two handles on the same
+  // file and threw NoModificationAllowedError.
+  const context = await browser.newContext({
+    deviceScaleFactor: 1,
+    hasTouch: true,
+    isMobile: true,
+    reducedMotion: 'reduce',
+    viewport: { width: 390, height: 844 },
+  });
   const page = await context.newPage();
   const errors = [];
   page.on('console', (message) => {
@@ -37,17 +43,20 @@ for (const [route, ready, file] of routes) {
     }
   });
   page.on('pageerror', (error) => {
-    // See capture-product-slice.mjs: known, web-export-only expo-sqlite Worker
-    // bundling issue that doesn't reach native iOS/Android builds.
-    if (!/Requiring unknown module/.test(error.message)) errors.push(error.message);
+    errors.push(error.message);
   });
   await page.goto(`http://127.0.0.1:4173/lesson/lesson-introduce-yourself/${route}`, {
     waitUntil: 'networkidle',
   });
   await page.getByText(ready, { exact: true }).first().waitFor();
+  // expo-image fades images in on web even with reducedMotion set (its
+  // crossfade is a JS-driven opacity animation, not the CSS media query), so
+  // screenshotting immediately after the ready text appears can catch photo
+  // cards mid-fade or fully transparent. Give the fade time to finish.
+  await page.waitForTimeout(600);
   if (errors.length > 0) throw new Error(`${route}: ${errors.join(' | ')}`);
   await page.screenshot({ path: resolve(auditDirectory, file), fullPage: true });
-  await page.close();
+  await context.close();
 }
 
 console.log(`LESSON_SLICE_SCREENSHOTS=${routes.length}`);

@@ -14,6 +14,7 @@ const contentTypes = {
   '.json': 'application/json; charset=utf-8',
   '.png': 'image/png',
   '.svg': 'image/svg+xml',
+  '.wasm': 'application/wasm',
 };
 
 const server = createServer(async (request, response) => {

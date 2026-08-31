@@ -1,4 +1,22 @@
+import type * as ExpoSQLite from 'expo-sqlite';
+
 import { localDatabaseName, localMigrations } from '@/infra/local/migrations';
+
+/**
+ * Lazily required rather than statically imported. Metro treats a top-level
+ * `import()` as an async code-split boundary, and Expo Router's static web
+ * export serializes each route as its own bundle — so a dynamically-imported
+ * shared module can end up referenced by a module ID that bundle never
+ * registered ("Requiring unknown module"). A plain `require()` call, even
+ * inside a function, is inlined synchronously by Metro instead of split into
+ * a separate chunk, which avoids that mismatch (same fix already applied to
+ * expo-audio and expo-notifications). It also keeps the native binding out of
+ * Jest's module graph until a real caller actually opens the database.
+ */
+function loadExpoSQLite(): typeof ExpoSQLite {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  return require('expo-sqlite');
+}
 
 export type LocalAttempt = {
   id: string;
@@ -172,7 +190,7 @@ export function createMemoryPersistence(): LocalPersistence {
 }
 
 export async function openBuaDatabase(): Promise<LocalPersistence> {
-  const { openDatabaseAsync } = await import('expo-sqlite');
+  const { openDatabaseAsync } = loadExpoSQLite();
   const database = await openDatabaseAsync(localDatabaseName);
   const versionRow = await database.getFirstAsync<{ user_version: number }>('pragma user_version');
   const currentVersion = versionRow?.user_version ?? 0;
