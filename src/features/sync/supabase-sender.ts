@@ -1,8 +1,9 @@
 import { z } from 'zod';
 
-import type { LocalSyncOperation } from '@/infra/local/database';
+import type { LocalPersistence, LocalSyncOperation } from '@/infra/local/database';
 import type { Database, Json } from '@/infra/supabase/database.types';
 import { getSupabaseClient } from '@/infra/supabase/client';
+import type { SendOutcome } from '@/features/sync/reconcile';
 
 const attemptPayloadSchema = z.object({
   id: z.string(),
@@ -36,12 +37,15 @@ function assertSuccess(result: { error: { message: string } | null }) {
   if (result.error) throw new Error(result.error.message);
 }
 
+export type SupabaseSenderClient = Pick<ReturnType<typeof getSupabaseClient>, 'from' | 'rpc'>;
+
 export async function sendOperationToSupabase(
   operation: LocalSyncOperation,
   signal: AbortSignal,
-): Promise<void> {
+  persistence: LocalPersistence,
+  { client = getSupabaseClient() }: { client?: SupabaseSenderClient } = {},
+): Promise<SendOutcome> {
   if (signal.aborted) throw new DOMException('Synchronization cancelled.', 'AbortError');
-  const client = getSupabaseClient();
   const payload = jsonPayloadSchema.parse(operation.payload) as Json;
   assertSuccess(
     await client.from('sync_operations').upsert(
@@ -55,6 +59,8 @@ export async function sendOperationToSupabase(
       { onConflict: 'id', ignoreDuplicates: true },
     ),
   );
+
+  let outcome: SendOutcome = {};
 
   if (operation.kind === 'attempt') {
     const attempt = attemptPayloadSchema.parse(operation.payload);
@@ -85,21 +91,36 @@ export async function sendOperationToSupabase(
     );
   } else if (operation.kind === 'profile') {
     const profile = profilePayloadSchema.parse(operation.payload);
-    assertSuccess(
-      await client.rpc('apply_progress_update', {
-        p_event_id: operation.id,
-        p_xp_awarded: profile.xpAwarded,
-        p_current_streak_days: profile.currentStreakDays,
-        p_longest_streak_days: profile.longestStreakDays,
-        p_last_activity_local_date: profile.lastActivityLocalDate,
-      }),
-    );
+    const { data, error } = await client.rpc('apply_progress_update', {
+      p_event_id: operation.id,
+      p_xp_awarded: profile.xpAwarded,
+      p_current_streak_days: profile.currentStreakDays,
+      p_longest_streak_days: profile.longestStreakDays,
+      p_last_activity_local_date: profile.lastActivityLocalDate,
+    });
+    if (error) throw new Error(error.message);
+    if (data) {
+      outcome = {
+        conflictResolved:
+          data.streak_days !== profile.currentStreakDays ||
+          data.last_activity_local_date !== profile.lastActivityLocalDate,
+      };
+      await persistence.upsertProgress({
+        ownerId: profile.ownerId,
+        totalXp: data.total_xp,
+        currentStreakDays: data.streak_days,
+        longestStreakDays: data.longest_streak_days,
+        lastActivityLocalDate: data.last_activity_local_date ?? '',
+        updatedAt: data.updated_at,
+      });
+    }
   } else if (operation.kind === 'purchase') {
     throw new Error('Purchase entitlement synchronization requires server verification.');
   }
 
   if (signal.aborted) throw new DOMException('Synchronization cancelled.', 'AbortError');
   assertSuccess(await client.rpc('ack_sync_operation', { p_operation_id: operation.id }));
+  return outcome;
 }
 
 export type SupabaseSyncDatabase = Database;

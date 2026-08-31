@@ -4,11 +4,14 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { AudioControl, Waveform } from '@/features/lesson-runner/activity-controls';
 import { LessonScaffold, lessonStyles } from '@/features/lesson-runner/lesson-scaffold';
+import { findTurn, getChoices, resolveChoice } from '@/features/lesson-runner/role-play';
+import { introduceYourselfRolePlay } from '@/content/role-play-seed';
 import { BuaButton } from '@/ui/controls/bua-button';
 import { FeedbackPanel } from '@/ui/feedback/feedback-panel';
 import { ChoiceCard } from '@/ui/lesson/choice-card';
 import { Mascot } from '@/ui/mascot/mascot';
 import { useTheme } from '@/ui/theme/theme-provider';
+import type { RolePlayTurn } from '@/types/domain';
 
 type ActivityScreenProps = { onClose: () => void; onContinue: () => void };
 
@@ -81,11 +84,21 @@ export function SoundFocusScreen({ onClose, onContinue }: ActivityScreenProps) {
   );
 }
 
+const ROLE_PLAY_PROMPT_ID = 'lerato-prompt';
+
 export function RolePlayScreen({ onClose, onContinue }: ActivityScreenProps) {
   const tokens = useTheme();
-  const choices = ['Igama lami nguNeo.', 'Ngiyabonga.', 'Hamba kahle.'];
-  const [selected, setSelected] = useState<string>();
-  const [result, setResult] = useState<'correct' | 'incorrect'>();
+  const promptTurn = findTurn(introduceYourselfRolePlay, ROLE_PLAY_PROMPT_ID);
+  const choices = getChoices(introduceYourselfRolePlay, ROLE_PLAY_PROMPT_ID);
+  const [selectedTurnId, setSelectedTurnId] = useState<string>();
+  const [outcome, setOutcome] = useState<{ correct: boolean; feedback: RolePlayTurn }>();
+
+  const evaluate = () => {
+    if (!selectedTurnId) return;
+    const { chosen, feedback } = resolveChoice(introduceYourselfRolePlay, selectedTurnId);
+    setOutcome({ correct: Boolean(chosen.correct), feedback });
+  };
+
   return (
     <LessonScaffold
       current={7}
@@ -110,10 +123,10 @@ export function RolePlayScreen({ onClose, onContinue }: ActivityScreenProps) {
           <AudioControl compact label="Replay Lerato’s question" />
           <View style={styles.copy}>
             <Text style={[tokens.typography.bodyLarge, { color: tokens.color.ink }]}>
-              Sawubona! Igama lakho ngubani?
+              {promptTurn.text}
             </Text>
             <Text style={[tokens.typography.bodySmall, { color: tokens.color.textMuted }]}>
-              Hello! What is your name?
+              {promptTurn.translation}
             </Text>
           </View>
         </View>
@@ -126,38 +139,30 @@ export function RolePlayScreen({ onClose, onContinue }: ActivityScreenProps) {
         <View style={lessonStyles.choices}>
           {choices.map((choice) => (
             <ChoiceCard
-              key={choice}
-              label={choice}
-              selected={selected === choice}
+              key={choice.id}
+              label={choice.text}
+              selected={selectedTurnId === choice.id}
               onPress={() => {
-                setSelected(choice);
-                setResult(undefined);
+                setSelectedTurnId(choice.id);
+                setOutcome(undefined);
               }}
             />
           ))}
         </View>
-        {result === 'incorrect' ? (
-          <FeedbackPanel
-            tone="coaching"
-            title="That means “thank you.”"
-            message="Introduce yourself with Igama lami…"
-          />
+        {outcome && !outcome.correct ? (
+          <FeedbackPanel tone="coaching" title="Not quite" message={outcome.feedback.text} />
         ) : null}
-        {result === 'correct' ? (
-          <FeedbackPanel
-            tone="success"
-            title="Perfect introduction"
-            message="Igama lami nguNeo answers with your name."
-          />
+        {outcome?.correct ? (
+          <FeedbackPanel tone="success" title="Perfect introduction" message={outcome.feedback.text} />
         ) : null}
         <BuaButton
           label={
-            result === 'correct' ? 'Continue' : selected ? 'Choose this reply' : 'Choose a reply'
+            outcome?.correct ? 'Continue' : selectedTurnId ? 'Choose this reply' : 'Choose a reply'
           }
-          disabled={!selected}
+          disabled={!selectedTurnId}
           onPress={() => {
-            if (result === 'correct') onContinue();
-            else setResult(selected === choices[0] ? 'correct' : 'incorrect');
+            if (outcome?.correct) onContinue();
+            else evaluate();
           }}
         />
       </View>

@@ -6,6 +6,7 @@ export const publicEnvSchema = z
     EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(20),
     EXPO_PUBLIC_APP_ENV: z.enum(['development', 'test', 'production']),
     EXPO_PUBLIC_DEMO_MODE: z.enum(['true', 'false']),
+    EXPO_PUBLIC_SENTRY_DSN: z.string().url().optional(),
   })
   .strict();
 
@@ -19,6 +20,7 @@ const runtimePublicEnvironment: Readonly<Partial<Record<PublicEnvKey, string | u
   EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
   EXPO_PUBLIC_APP_ENV: process.env.EXPO_PUBLIC_APP_ENV,
   EXPO_PUBLIC_DEMO_MODE: process.env.EXPO_PUBLIC_DEMO_MODE,
+  EXPO_PUBLIC_SENTRY_DSN: process.env.EXPO_PUBLIC_SENTRY_DSN,
 };
 
 export class ConfigurationError extends Error {

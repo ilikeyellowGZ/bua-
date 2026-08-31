@@ -17,6 +17,7 @@ export type Database = {
           longest_streak_days: number;
           last_activity_local_date: string | null;
           onboarding_completed: boolean;
+          deletion_requested_at: Timestamp | null;
           created_at: Timestamp;
           updated_at: Timestamp;
         };
@@ -31,6 +32,7 @@ export type Database = {
           longest_streak_days?: number;
           last_activity_local_date?: string | null;
           onboarding_completed?: boolean;
+          deletion_requested_at?: Timestamp | null;
           created_at?: Timestamp;
           updated_at?: Timestamp;
         };
@@ -257,9 +259,43 @@ export type Database = {
         Update: Partial<Database['public']['Tables']['review_schedule']['Insert']>;
         Relationships: [];
       };
+      app_error_events: {
+        Row: {
+          id: string;
+          owner_id: string;
+          kind: 'error' | 'message';
+          summary: string;
+          context: Json;
+          occurred_at: Timestamp;
+        };
+        Insert: {
+          id: string;
+          owner_id: string;
+          kind: 'error' | 'message';
+          summary: string;
+          context?: Json;
+          occurred_at?: Timestamp;
+        };
+        Update: never;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
+      is_admin: { Args: { p_user_id?: string }; Returns: boolean };
+      admin_dashboard_snapshot: {
+        Args: Record<string, never>;
+        Returns: {
+          total_users: number;
+          active_users_7d: number;
+          lesson_completions_today: number;
+          pending_sync_operations: number;
+          failed_sync_operations: number;
+          oldest_pending_sync_seconds: number | null;
+          error_events_24h: number;
+          average_streak_days: number;
+        }[];
+      };
       complete_lesson_once: {
         Args: {
           p_completion_id: string;

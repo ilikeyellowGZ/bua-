@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { calculateDictationScore } from '@/features/lesson-runner/scoring';
 import { AudioControl, Waveform } from '@/features/lesson-runner/activity-controls';
 import { LessonScaffold, lessonStyles } from '@/features/lesson-runner/lesson-scaffold';
+import { useVoicePractice } from '@/features/lesson-runner/use-voice-practice';
 import { BuaButton } from '@/ui/controls/bua-button';
 import { FeedbackPanel } from '@/ui/feedback/feedback-panel';
 import { ChoiceCard } from '@/ui/lesson/choice-card';
@@ -530,9 +531,13 @@ export function DictationScreen({ onClose, onContinue }: ActivityScreenProps) {
   );
 }
 
+const CLICK_PRONUNCIATION_EXPECTED_TEXT = 'Sawubona. Igama lami nguNeo.';
+
 export function ClickPronunciationScreen({ onClose, onContinue }: ActivityScreenProps) {
   const tokens = useTheme();
-  const [result, setResult] = useState(false);
+  const { status, result, record } = useVoicePractice({
+    expectedText: CLICK_PRONUNCIATION_EXPECTED_TEXT,
+  });
   return (
     <LessonScaffold
       current={7}
@@ -559,18 +564,27 @@ export function ClickPronunciationScreen({ onClose, onContinue }: ActivityScreen
           <Pressable
             accessibilityLabel="Start click-pronunciation practice"
             accessibilityRole="button"
-            onPress={() => setResult(true)}
+            onPress={() => record()}
             style={[styles.mic, { backgroundColor: tokens.color.aloe }]}
           >
             <Text style={[tokens.typography.h1, { color: tokens.color.surface }]}>●</Text>
           </Pressable>
           <Text style={[tokens.typography.body, { color: result ? tokens.color.aloe : '#A9B5C2' }]}>
-            {result ? 'Practice captured' : 'Tap when ready'}
+            {status === 'processing'
+              ? 'Checking…'
+              : status === 'denied'
+                ? 'Microphone access needed'
+                : result
+                  ? 'Practice captured'
+                  : 'Tap when ready'}
           </Text>
         </View>
         {result ? (
           <View style={[styles.metricRow, { borderColor: '#75869A' }]}>
-            {['Timing\nGreat!', 'Clarity\nClear!', 'Confidence\nKeep going!'].map((label) => (
+            {(result.label === 'good-clarity'
+              ? ['Timing\nGreat!', 'Clarity\nClear!', 'Confidence\nNice work!']
+              : ['Timing\nTry again', 'Clarity\nListen once more', 'Confidence\nKeep going!']
+            ).map((label) => (
               <Text
                 key={label}
                 style={[
@@ -597,9 +611,17 @@ export function ClickPronunciationScreen({ onClose, onContinue }: ActivityScreen
   );
 }
 
+const SPEAK_EXPECTED_TEXT = 'Sawubona. Igama lami nguNeo.';
+const SPEAK_SEGMENTS = ['Sawubona', 'Igama lami', 'nguNeo'];
+const SPEAK_DEMO_TRANSCRIPT = 'Sawubona Igama lami Sipho';
+
 export function SpeakScreen({ onClose, onContinue }: ActivityScreenProps) {
   const tokens = useTheme();
-  const [result, setResult] = useState(false);
+  const { status, result, record, reset } = useVoicePractice({
+    expectedText: SPEAK_EXPECTED_TEXT,
+    segments: SPEAK_SEGMENTS,
+    demoTranscript: SPEAK_DEMO_TRANSCRIPT,
+  });
   return (
     <LessonScaffold
       current={8}
@@ -618,37 +640,49 @@ export function SpeakScreen({ onClose, onContinue }: ActivityScreenProps) {
           <Pressable
             accessibilityLabel="Start speaking practice"
             accessibilityRole="button"
-            onPress={() => setResult(true)}
+            onPress={() => record()}
             style={[styles.mic, { backgroundColor: tokens.color.aloe }]}
           >
             <Text style={[tokens.typography.h1, { color: tokens.color.surface }]}>●</Text>
           </Pressable>
         </View>
+        {status === 'processing' ? (
+          <Text
+            accessibilityLiveRegion="polite"
+            style={[tokens.typography.body, styles.centerText, { color: tokens.color.surface }]}
+          >
+            Checking your pronunciation…
+          </Text>
+        ) : null}
+        {status === 'denied' ? (
+          <Text
+            accessibilityLiveRegion="polite"
+            style={[tokens.typography.body, styles.centerText, { color: tokens.color.sunPressed }]}
+          >
+            Microphone access is needed to practise speaking.
+          </Text>
+        ) : null}
         {result ? (
           <>
             <Text
               accessibilityLiveRegion="polite"
               style={[tokens.typography.h3, styles.centerText, { color: tokens.color.aloe }]}
             >
-              Good clarity
+              {result.label === 'good-clarity' ? 'Good clarity' : 'Keep practising'}
             </Text>
             <View style={[styles.feedbackCard, { backgroundColor: tokens.color.paper }]}>
-              {[
-                ['Sawubona', '✓'],
-                ['Igama lami', '✓'],
-                ['nguNeo', 'Try the “ngu” sound once more.'],
-              ].map(([part, feedback]) => (
-                <View key={part} style={styles.feedbackRow}>
+              {result.segmentScores.map(({ segment, correct }) => (
+                <View key={segment} style={styles.feedbackRow}>
                   <Text style={[tokens.typography.bodyLarge, { color: tokens.color.ink }]}>
-                    {part}
+                    {segment}
                   </Text>
                   <Text
                     style={[
                       tokens.typography.bodySmall,
-                      { color: feedback === '✓' ? tokens.color.aloe : tokens.color.sunPressed },
+                      { color: correct ? tokens.color.aloe : tokens.color.sunPressed },
                     ]}
                   >
-                    {feedback}
+                    {correct ? '✓' : `Try “${segment}” again.`}
                   </Text>
                 </View>
               ))}
@@ -662,7 +696,8 @@ export function SpeakScreen({ onClose, onContinue }: ActivityScreenProps) {
           <BuaButton
             label="Try again"
             variant="outline"
-            onPress={() => setResult(false)}
+            onPress={reset}
+            disabled={!result}
             style={styles.flexButton}
           />
           <BuaButton

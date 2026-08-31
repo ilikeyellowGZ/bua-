@@ -10,6 +10,8 @@ describe('Supabase migration security contract', () => {
   const functions = readMigration('202608210003_bua_functions.sql');
   const liveIdentity = readMigration('202608220001_live_identity.sql');
   const progress = readMigration('202608220002_bua_progress.sql');
+  const accountDeletion = readMigration('202608220003_bua_account_deletion.sql');
+  const adminMonitoring = readMigration('202608220004_bua_admin_monitoring.sql');
 
   it('uses timezone-aware timestamps, constraints, and indexed ownership keys', () => {
     expect(core).not.toMatch(/\btimestamp\b(?!tz)/);
@@ -60,9 +62,11 @@ describe('Supabase migration security contract', () => {
   });
 
   it('creates exactly one profile for each auth user', () => {
-    expect(liveIdentity).toContain('alter table public.profiles add column onboarding_completed');
+    expect(liveIdentity).toContain('alter table public.profiles');
+    expect(liveIdentity).toContain('add column if not exists onboarding_completed');
     expect(liveIdentity).toContain('create or replace function public.handle_new_user()');
-    expect(liveIdentity).toContain("security definer set search_path = ''");
+    expect(liveIdentity).toContain('security definer');
+    expect(liveIdentity).toContain("set search_path = ''");
     expect(liveIdentity).toContain('on conflict (id) do nothing');
     expect(liveIdentity).toContain('create trigger on_auth_user_created');
     expect(liveIdentity).toContain('after insert on auth.users');
@@ -79,5 +83,26 @@ describe('Supabase migration security contract', () => {
     expect(progress).toContain('on conflict (id) do nothing');
     expect(progress).toContain('get diagnostics inserted = row_count');
     expect(progress).toContain('revoke all on function public.apply_progress_update');
+  });
+
+  it('adds an idempotent, RLS-scoped column for GDPR-style account deletion requests', () => {
+    expect(accountDeletion).toContain('alter table public.profiles');
+    expect(accountDeletion).toContain('add column if not exists deletion_requested_at timestamptz');
+  });
+
+  it('gates admin aggregates behind is_admin() and never grants raw cross-user row access', () => {
+    expect(adminMonitoring).toContain('alter table public.app_error_events enable row level security');
+    expect(adminMonitoring).toContain('alter table public.app_error_events force row level security');
+    expect(adminMonitoring).toContain('(select auth.uid()) = owner_id');
+
+    // The dashboard is a single SECURITY DEFINER aggregate RPC gated by is_admin() —
+    // there must be no RLS policy granting admins broader row-level SELECT access.
+    expect(adminMonitoring).not.toMatch(/create policy[^;]*is_admin/s);
+    expect(adminMonitoring.match(/security definer/g)).toHaveLength(2);
+    expect(adminMonitoring.match(/set search_path = ''/g)).toHaveLength(2);
+    expect(adminMonitoring).toContain('if not public.is_admin() then');
+    expect(adminMonitoring).toContain("raise exception 'administrator access required'");
+    expect(adminMonitoring).toContain('revoke all on function public.is_admin');
+    expect(adminMonitoring).toContain('revoke all on function public.admin_dashboard_snapshot');
   });
 });

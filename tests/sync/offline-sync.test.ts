@@ -86,7 +86,7 @@ describe('offline-first progress and synchronization', () => {
       throw new Error('must not be called');
     });
 
-    expect(result).toEqual({ acknowledged: 0, failed: 0, cancelled: true });
+    expect(result).toEqual({ acknowledged: 0, failed: 0, conflictsResolved: 0, cancelled: true });
     expect(await sync.listPending(1_000)).toHaveLength(1);
   });
 
@@ -105,9 +105,34 @@ describe('offline-first progress and synchronization', () => {
     expect(await reconcilePendingOperations(new AbortController().signal, sync, send)).toEqual({
       acknowledged: 1,
       failed: 0,
+      conflictsResolved: 0,
       cancelled: false,
     });
     expect(send).toHaveBeenCalledTimes(1);
     expect(await sync.listPending(2_000)).toHaveLength(0);
+  });
+
+  it('reports a real send failure to monitoring before marking the operation failed', async () => {
+    const persistence = createMemoryPersistence();
+    const sync = createSyncRepository(persistence, { now: () => 1_000 });
+    await sync.enqueue({
+      id: 'operation-broken',
+      ownerId,
+      kind: 'attempt',
+      aggregateId: 'attempt-broken',
+      payload: {},
+    });
+    const send = jest.fn().mockRejectedValue(new Error('network unreachable'));
+    const captureError = jest.fn();
+
+    const result = await reconcilePendingOperations(new AbortController().signal, sync, send, {
+      captureError,
+    });
+
+    expect(result).toEqual({ acknowledged: 0, failed: 1, conflictsResolved: 0, cancelled: false });
+    expect(captureError).toHaveBeenCalledWith(
+      expect.any(Error),
+      expect.objectContaining({ operationId: 'operation-broken', kind: 'attempt' }),
+    );
   });
 });

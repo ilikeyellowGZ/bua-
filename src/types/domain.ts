@@ -77,7 +77,7 @@ export type Attempt = {
 export type PronunciationResult = {
   score: number;
   label: 'good-clarity' | 'keep-practicing';
-  segmentScores: { segment: string; score: number }[];
+  segmentScores: { segment: string; score: number; correct: boolean }[];
 };
 
 export type RolePlayTurn = {
@@ -85,6 +85,9 @@ export type RolePlayTurn = {
   speaker: 'learner' | 'character' | 'coach';
   text: string;
   nextTurnIds: string[];
+  translation?: string;
+  /** For a learner turn: whether choosing it is the best reply. */
+  correct?: boolean;
 };
 
 export type StreakState = {

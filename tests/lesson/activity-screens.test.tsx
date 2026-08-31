@@ -2,6 +2,7 @@ import { render, screen, userEvent } from '@testing-library/react-native';
 
 import { MotionProvider } from '@/core/motion/motion-provider';
 import {
+  ClickPronunciationScreen,
   ComprehensionScreen,
   DictationScreen,
   ListenScreen,
@@ -79,6 +80,38 @@ describe('Bua lesson activity screens', () => {
     expect(screen.getByText('Demo practice result')).toBeOnTheScreen();
   });
 
+  it('scores the seeded speaking attempt per phrase segment through the real pronunciation pipeline', async () => {
+    const onContinue = jest.fn();
+    const user = userEvent.setup();
+    await render(withProviders(<SpeakScreen onClose={jest.fn()} onContinue={onContinue} />));
+
+    await user.press(screen.getByRole('button', { name: 'Start speaking practice' }));
+    expect(screen.getByText('Sawubona')).toBeOnTheScreen();
+    expect(screen.getByText('Igama lami')).toBeOnTheScreen();
+    expect(screen.getByText('Try “nguNeo” again.')).toBeOnTheScreen();
+
+    expect(screen.getByRole('button', { name: 'Continue' })).not.toBeDisabled();
+    await user.press(screen.getByRole('button', { name: 'Try again' }));
+    expect(screen.queryByText('Good clarity')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Continue', disabled: true })).toBeDisabled();
+  });
+
+  it('captures a click-pronunciation practice attempt through the real pipeline', async () => {
+    const onContinue = jest.fn();
+    const user = userEvent.setup();
+    await render(
+      withProviders(<ClickPronunciationScreen onClose={jest.fn()} onContinue={onContinue} />),
+    );
+
+    expect(screen.getByRole('button', { name: 'Check my sound', disabled: true })).toBeDisabled();
+    await user.press(screen.getByRole('button', { name: 'Start click-pronunciation practice' }));
+    expect(screen.getByText('Practice captured')).toBeOnTheScreen();
+    expect(screen.getByText('Timing\nGreat!')).toBeOnTheScreen();
+
+    await user.press(screen.getByRole('button', { name: 'Continue' }));
+    expect(onContinue).toHaveBeenCalledTimes(1);
+  });
+
   it('checks sound focus explicitly after a selection', async () => {
     const onContinue = jest.fn();
     const user = userEvent.setup();
@@ -97,9 +130,23 @@ describe('Bua lesson activity screens', () => {
 
     await user.press(screen.getByRole('radio', { name: /Ngiyabonga/ }));
     await user.press(screen.getByRole('button', { name: 'Choose this reply' }));
-    expect(screen.getByText('That means “thank you.”')).toBeOnTheScreen();
+    expect(
+      screen.getByText('“Ngiyabonga” means “thank you.” Introduce yourself with “Igama lami…” instead.'),
+    ).toBeOnTheScreen();
     await user.press(screen.getByRole('radio', { name: /Igama lami nguNeo/ }));
     await user.press(screen.getByRole('button', { name: 'Choose this reply' }));
     expect(screen.getByText('Perfect introduction')).toBeOnTheScreen();
+  });
+
+  it('gives each wrong reply its own contextually correct feedback, fixing the shared-message bug', async () => {
+    const user = userEvent.setup();
+    await render(withProviders(<RolePlayScreen onClose={jest.fn()} onContinue={jest.fn()} />));
+
+    await user.press(screen.getByRole('radio', { name: /Hamba kahle/ }));
+    await user.press(screen.getByRole('button', { name: 'Choose this reply' }));
+    expect(
+      screen.getByText('“Hamba kahle” means “goodbye.” Introduce yourself with “Igama lami…” instead.'),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText(/thank you/)).toBeNull();
   });
 });
