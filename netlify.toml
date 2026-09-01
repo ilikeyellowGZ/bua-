@@ -1,0 +1,92 @@
+# Netlify deploy config for the web build of Bua (expo export --platform web).
+#
+# Required before the first deploy: set these in Netlify's dashboard under
+# Site configuration -> Environment variables (never commit real values —
+# see .env.example for the full list and what each one is for):
+#   EXPO_PUBLIC_SUPABASE_URL
+#   EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+#   EXPO_PUBLIC_APP_ENV            (e.g. "production")
+#   EXPO_PUBLIC_DEMO_MODE          ("true" for a web preview with no live
+#                                    Supabase backend wired up; native-only
+#                                    features like audio recording and push
+#                                    notifications don't apply on web anyway)
+#   EXPO_PUBLIC_SENTRY_DSN         (optional)
+# All EXPO_PUBLIC_* values are inlined into the JS bundle at build time, not
+# read at runtime, so they must be set before the build runs, and the build
+# fails fast with a clear error if any required one is missing.
+
+[build]
+  command = "npm run build:web"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22.13.0"
+
+# Expo Router's static export writes one HTML file per literal route, but a
+# dynamic segment like /lesson/[lessonId]/listen only gets a single template
+# file at the literal "[lessonId]" path (see scripts/serve-static.mjs, which
+# implements this same fallback for local preview). Rewrite every real
+# lessonId back to that template so client-side code can read the real id
+# from the URL via useLocalSearchParams.
+[[redirects]]
+  from = "/lesson/:lessonId/listen"
+  to = "/lesson/[lessonId]/listen.html"
+  status = 200
+[[redirects]]
+  from = "/lesson/:lessonId/phrase-builder"
+  to = "/lesson/[lessonId]/phrase-builder.html"
+  status = 200
+[[redirects]]
+  from = "/lesson/:lessonId/picture-match"
+  to = "/lesson/[lessonId]/picture-match.html"
+  status = 200
+[[redirects]]
+  from = "/lesson/:lessonId/conversation"
+  to = "/lesson/[lessonId]/conversation.html"
+  status = 200
+[[redirects]]
+  from = "/lesson/:lessonId/comprehension"
+  to = "/lesson/[lessonId]/comprehension.html"
+  status = 200
+[[redirects]]
+  from = "/lesson/:lessonId/dictation"
+  to = "/lesson/[lessonId]/dictation.html"
+  status = 200
+[[redirects]]
+  from = "/lesson/:lessonId/click-pronunciation"
+  to = "/lesson/[lessonId]/click-pronunciation.html"
+  status = 200
+[[redirects]]
+  from = "/lesson/:lessonId/speak"
+  to = "/lesson/[lessonId]/speak.html"
+  status = 200
+[[redirects]]
+  from = "/lesson/:lessonId/role-play"
+  to = "/lesson/[lessonId]/role-play.html"
+  status = 200
+[[redirects]]
+  from = "/lesson/:lessonId/sound-focus"
+  to = "/lesson/[lessonId]/sound-focus.html"
+  status = 200
+[[redirects]]
+  from = "/lesson/:lessonId/complete"
+  to = "/lesson/[lessonId]/complete.html"
+  status = 200
+
+# Anything else unmatched gets Expo Router's real not-found page (as a real
+# 404 status, not a soft 200) instead of Netlify's generic default.
+[[redirects]]
+  from = "/*"
+  to = "/+not-found.html"
+  status = 404
+
+# Long-cache the content-hashed JS/asset bundle; never cache HTML so a new
+# deploy is picked up immediately instead of from a stale cached page.
+[[headers]]
+  for = "/_expo/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
