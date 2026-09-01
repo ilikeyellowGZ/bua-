@@ -55,4 +55,16 @@ describe('computePathItems', () => {
     const items = computePathItems(shuffled, lessons, []);
     expect(items.map((item) => item.unitId)).toEqual(['unit-a', 'unit-b', 'unit-c']);
   });
+
+  it('unlocks every unit before the placement starting index even if not completed', () => {
+    const items = computePathItems(units, lessons, [], 2);
+    expect(items.map((item) => item.state)).toEqual(['active', 'active', 'active']);
+  });
+
+  it('still locks units past the placement index once a real incomplete unit is hit', () => {
+    const fourUnits = [...units, { id: 'unit-d', courseId: 'course-1', title: 'Unit D', order: 4 }];
+    const fourLessons = [...lessons, lesson('lesson-d1', 'unit-d')];
+    const items = computePathItems(fourUnits, fourLessons, [], 2);
+    expect(items.map((item) => item.state)).toEqual(['active', 'active', 'active', 'locked']);
+  });
 });

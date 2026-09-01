@@ -53,7 +53,7 @@ type LearnScreenProps = {
   onContinueLesson: () => void;
   onQuickReview: () => void;
   onSelectUnit?: (unitId: string) => void;
-  path?: PathItem[];
+  path?: PathItem[] | undefined;
 };
 
 export function LearnScreen({

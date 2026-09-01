@@ -57,7 +57,7 @@ export function WelcomeScreen({
         </Text>
       </MotionEntrance>
 
-      <View style={styles.mascotWrap}>
+      <View style={[styles.mascotWrap, { minHeight: mascotSize }]}>
         <Mascot
           accessibilityLabel="Thandi waves with her book"
           motion="coach"
@@ -108,7 +108,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    minHeight: 320,
   },
   wordmark: {
     fontSize: 88,
